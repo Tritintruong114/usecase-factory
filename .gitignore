@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+
+# Local Claude Code settings (machine-specific, not part of the plugin)
+.claude/
+.claude/settings.local.json
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Packed tarballs
+*.tgz
+
+# Generated research outputs (use-case dossiers/docs are produced at runtime)
+doc/
+output/
