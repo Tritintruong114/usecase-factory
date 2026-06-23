@@ -48,12 +48,21 @@ usecase-factory/
     coverage-check.sh          # checks the 4 output docs exist + are placeholder-free
 ```
 
+## Install from the marketplace
+
+```
+/plugin marketplace add Tritintruong114/usecase-factory
+/plugin install usecase-factory@clawexperts
+```
+
+Then refresh later with `/plugin marketplace update`.
+
 ## Test it locally
 
-From the directory that contains the `usecase-factory/` folder:
+From the cloned repo root:
 
 ```bash
-claude --plugin-dir ./usecase-factory
+claude --plugin-dir .
 ```
 
 Then, inside Claude Code:
@@ -75,8 +84,8 @@ If you omit the idea, the skill looks for `doc/ws-<slug>/brief.md`, then asks up
 The skill runs these automatically before finishing; you can also run them by hand:
 
 ```bash
-bash usecase-factory/scripts/validate-dossier.sh doc/ws-<slug>/_research/dossier.md
-bash usecase-factory/scripts/coverage-check.sh   doc/ws-<slug> <slug>
+bash scripts/validate-dossier.sh doc/ws-<slug>/_research/dossier.md
+bash scripts/coverage-check.sh   doc/ws-<slug> <slug>
 ```
 
 - `validate-dossier.sh` — confirms the dossier carries sections 0–9, an Evidence Table, and a Decision Gate verdict.
@@ -97,7 +106,7 @@ A few rules are load-bearing — they are what make the output trustworthy:
 
 - **v0.1.0** — local plugin MVP.
 - **1 skill** (`run`) + **5 agents** (4 research workers + 1 adversarial decision-gate reviewer).
-- Tested locally with `claude --plugin-dir ./usecase-factory` (skill + all 5 agents discovered via `claude plugin details`).
+- Tested locally with `claude --plugin-dir .` (skill + all 5 agents discovered via `claude plugin details`).
 - **npm-ready but not published** — no package will be pushed unless the maintainer explicitly confirms.
 
 ## Publishing

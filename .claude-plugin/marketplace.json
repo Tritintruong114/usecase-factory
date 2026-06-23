@@ -1,0 +1,21 @@
+{
+  "name": "clawexperts",
+  "owner": {
+    "name": "ClawExperts",
+    "email": "tintt@firegroup.io"
+  },
+  "description": "ClawExperts plugins — expert workflows packaged as installable Claude Code plugins.",
+  "plugins": [
+    {
+      "name": "usecase-factory",
+      "source": "./",
+      "description": "Research an AI Agent product idea into a dossier + four research docs and a Proceed/Pivot/Narrow/Kill decision.",
+      "version": "0.1.0",
+      "author": { "name": "ClawExperts", "email": "tintt@firegroup.io" },
+      "license": "MIT",
+      "homepage": "https://github.com/Tritintruong114/usecase-factory",
+      "repository": "https://github.com/Tritintruong114/usecase-factory",
+      "keywords": ["use-case", "market-research", "ai-agent", "discovery"]
+    }
+  ]
+}
