@@ -40,10 +40,18 @@ LOG_FILE="$LOG_DIR/${SLUG}-${STAMP}.log"
 LOCK_DIR="/tmp/usecase-factory-${SLUG}.lock"
 
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  echo "Another usecase-factory run is already active for slug: $SLUG" >&2
-  exit 75
+  existing_pid="$(cat "$LOCK_DIR/pid" 2>/dev/null || true)"
+  if [[ -z "$existing_pid" ]] || ! kill -0 "$existing_pid" 2>/dev/null; then
+    rm -f "$LOCK_DIR/pid"
+    rmdir "$LOCK_DIR" 2>/dev/null || true
+    mkdir "$LOCK_DIR"
+  else
+    echo "Another usecase-factory run is already active for slug: $SLUG" >&2
+    exit 75
+  fi
 fi
-trap 'rmdir "$LOCK_DIR"' EXIT
+echo "$$" > "$LOCK_DIR/pid"
+trap 'rm -f "$LOCK_DIR/pid"; rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
 
 PROMPT="/usecase-factory:run $SLUG"
 if [[ -n "$IDEA" ]]; then
