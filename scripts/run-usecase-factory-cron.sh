@@ -70,12 +70,13 @@ if [[ -n "$CLAUDE_MAX_BUDGET_USD" ]]; then
   CLAUDE_ARGS+=(--max-budget-usd "$CLAUDE_MAX_BUDGET_USD")
 fi
 
+set +e
 (
   cd "$ROOT_DIR"
   "$CLAUDE_BIN" "${CLAUDE_ARGS[@]}" "$PROMPT"
 ) 2>&1 | tee -a "$LOG_FILE"
-
 status=${PIPESTATUS[0]}
+set -e
 {
   echo
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Finished with status $status"
