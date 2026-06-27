@@ -34,6 +34,11 @@ Pick exactly ONE promising agent app idea for either:
 
 Avoid generic "AI assistant" ideas. Prefer sharp daily/weekly workflows with a painful before-state, clear repeated trigger, messy context, multi-step tool use, follow-up, and a human checkpoint.
 
+Think agent-flow first, user-flow second:
+- Agent Flow is the product spine: trigger → context → plan → tools → decision points → human checkpoint → action → follow-up → memory/update → failure handling.
+- User Flow is the control surface around that spine: review queue, approvals, overrides, history, settings, and exception handling.
+- Do not describe the app as a conventional SaaS screen journey first. Start from what the agent does when work arrives, then describe how the human supervises it.
+
 Required output:
 
 # <short product-style name>
@@ -67,14 +72,25 @@ Score each axis Yes / Weak / No with one short reason:
 - Proactive follow-up:
 - Human checkpoint:
 
-## Agent app concept
+## Agent flow
 - Trigger:
-- Inputs:
+- Context / memory:
+- Plan:
 - Tools / integrations:
-- Agent loop:
-- Human approval point:
-- Output:
-- Success metric:
+- Decision points:
+- Human checkpoint:
+- Action:
+- Follow-up:
+- Memory / learning update:
+- Failure handling:
+
+## Control surface / user flow
+- Primary surface:
+- Review queue:
+- Approval / override actions:
+- History / audit trail:
+- Settings:
+- Exception handling:
 
 ## MVP scope
 - v0 core loop:
