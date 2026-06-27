@@ -26,9 +26,19 @@ LOG_FILE="$LOG_DIR/daily-agent-app-idea-$STAMP.log"
 PROMPT=$(cat <<'PROMPT_EOF'
 You are creating one concrete AI Agent app seed for ClawExperts.
 
-Write a single Markdown brief in Vietnamese. It must be specific enough to become input for `/usecase-factory:run`, but it is only an idea seed, not market research.
+This seed must start from a real market problem signal, not pure brainstorming.
+First do a lightweight web research scan, then choose exactly ONE problem worth turning into an agent app idea.
 
-Pick exactly ONE promising agent app idea for either:
+Research scope:
+- Search current public sources from global and/or Vietnam markets.
+- Look for repeated operational pain, workaround-heavy workflows, manual coordination, missed follow-up, compliance/admin drag, creator/operator bottlenecks, or support/sales/finance/research tasks that already happen daily/weekly.
+- Prefer sources such as forums, product reviews, app marketplace reviews, industry reports, job posts, LinkedIn/community posts, vendor docs, public case studies, and news about regulatory or workflow changes.
+- Do not invent market stats. If a signal is weak, label it weak.
+- Use at least 3 source URLs in the brief. If web access fails, say so explicitly and write a lower-confidence seed.
+
+Write a single Markdown brief in Vietnamese. It must be specific enough to become input for `/usecase-factory:run`, but it is still a lightweight researched seed, not the full usecase-factory dossier.
+
+Choose exactly ONE promising problem-to-agent-app direction for either:
 - end-users: individual consumers, creators, freelancers, students, families, professionals, or
 - power users: operators, founders, sales/admin/finance/support leads, analysts, agency owners, no-code builders.
 
@@ -48,6 +58,14 @@ Required output:
 
 ## One-liner
 <one sentence>
+
+## Market problem signal
+- Market / geography scanned:
+- Source URLs:
+- Repeated pain observed:
+- Existing workaround:
+- Why this looks agent-worthy:
+- Confidence: High / Medium / Low
 
 ## Target user
 - Segment:
