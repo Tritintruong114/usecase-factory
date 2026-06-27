@@ -26,10 +26,16 @@ LOG_FILE="$LOG_DIR/daily-agent-app-idea-$STAMP.log"
 PROMPT=$(cat <<'PROMPT_EOF'
 You are creating one concrete AI Agent app seed for ClawExperts.
 
+Output language rule:
+- Write the Markdown brief in Vietnamese 100%.
+- Section headings, field labels, rationale, risk questions, and notes must be Vietnamese.
+- Allowed non-Vietnamese: URLs, product/company names, technical proper nouns, API names, and the shell command in the final code block.
+- Do not use English section headings such as "Target user", "Pain hypothesis", "Agent flow", "Control surface", "MVP scope", or "Factory command".
+
 This seed must start from a real market problem signal, not pure brainstorming.
 First do a lightweight web research scan, then choose exactly ONE problem worth turning into an agent app idea.
 
-Research scope:
+Phạm vi quét vấn đề:
 - Search current public sources from global and/or Vietnam markets.
 - Look for repeated operational pain, workaround-heavy workflows, manual coordination, missed follow-up, compliance/admin drag, creator/operator bottlenecks, or support/sales/finance/research tasks that already happen daily/weekly.
 - Prefer sources such as forums, product reviews, app marketplace reviews, industry reports, job posts, LinkedIn/community posts, vendor docs, public case studies, and news about regulatory or workflow changes.
@@ -49,82 +55,82 @@ Think agent-flow first, user-flow second:
 - User Flow is the control surface around that spine: review queue, approvals, overrides, history, settings, and exception handling.
 - Do not describe the app as a conventional SaaS screen journey first. Start from what the agent does when work arrives, then describe how the human supervises it.
 
-Required output:
+Format bắt buộc:
 
 # <short product-style name>
 
 ## Slug
 <lowercase-kebab-case-slug>
 
-## One-liner
-<one sentence>
+## Một câu mô tả
+<một câu>
 
-## Market problem signal
-- Market / geography scanned:
-- Source URLs:
-- Repeated pain observed:
-- Existing workaround:
-- Why this looks agent-worthy:
-- Confidence: High / Medium / Low
+## Tín hiệu vấn đề thị trường
+- Thị trường / địa lý đã quét:
+- Nguồn tham khảo:
+- Nỗi đau lặp lại quan sát được:
+- Cách làm thay thế hiện tại:
+- Vì sao vấn đề này hợp với agent:
+- Độ tin cậy: Cao / Trung bình / Thấp
 
-## Target user
-- Segment:
-- Power-user or end-user:
-- Market / geography:
-- Buyer:
-- User:
+## Người dùng mục tiêu
+- Phân khúc:
+- Nhóm người dùng:
+- Thị trường / địa lý:
+- Người mua:
+- Người dùng trực tiếp:
 
-## Pain hypothesis
-- Current workflow:
-- Specific pain:
-- Frequency:
-- Why now:
-- Current substitutes:
+## Giả thuyết nỗi đau
+- Quy trình hiện tại:
+- Nỗi đau cụ thể:
+- Tần suất:
+- Vì sao là lúc này:
+- Cách thay thế hiện tại:
 
-## Agent fit
-Score each axis Yes / Weak / No with one short reason:
-- Judgment:
-- Multi-step tool use:
-- Memory / context:
-- Messy conversation:
-- Proactive follow-up:
-- Human checkpoint:
+## Độ phù hợp với agent
+Chấm từng trục Có / Yếu / Không, kèm một lý do ngắn:
+- Cần phán đoán:
+- Cần dùng nhiều công cụ / nhiều bước:
+- Cần trí nhớ / ngữ cảnh:
+- Có hội thoại hoặc dữ liệu lộn xộn:
+- Cần chủ động theo dõi:
+- Cần điểm duyệt của con người:
 
-## Agent flow
-- Trigger:
-- Context / memory:
-- Plan:
-- Tools / integrations:
-- Decision points:
-- Human checkpoint:
-- Action:
-- Follow-up:
-- Memory / learning update:
-- Failure handling:
+## Luồng agent
+- Kích hoạt:
+- Ngữ cảnh / trí nhớ:
+- Kế hoạch:
+- Công cụ / tích hợp:
+- Điểm ra quyết định:
+- Điểm duyệt của con người:
+- Hành động:
+- Theo dõi tiếp:
+- Cập nhật trí nhớ / học từ phản hồi:
+- Xử lý lỗi:
 
-## Control surface / user flow
-- Primary surface:
-- Review queue:
-- Approval / override actions:
-- History / audit trail:
-- Settings:
-- Exception handling:
+## Bề mặt điều khiển / luồng người dùng
+- Bề mặt chính:
+- Hàng đợi duyệt:
+- Hành động duyệt / can thiệp:
+- Lịch sử / audit trail:
+- Cài đặt:
+- Xử lý ngoại lệ:
 
-## MVP scope
-- v0 core loop:
-- Must have:
-- Explicitly not v0:
-- Data needed:
+## Phạm vi MVP
+- Vòng lặp lõi v0:
+- Bắt buộc có:
+- Chưa làm ở v0:
+- Dữ liệu cần có:
 
-## Risk questions for usecase-factory
-- Buyer clarity:
-- Pain intensity:
-- Willingness to pay:
-- Substitute strength:
-- Feasibility:
-- GTM wedge:
+## Câu hỏi rủi ro cho usecase-factory
+- Độ rõ của người mua:
+- Cường độ nỗi đau:
+- Sẵn sàng chi trả:
+- Sức mạnh của cách thay thế:
+- Tính khả thi:
+- Wedge GTM:
 
-## Factory command
+## Lệnh chạy factory
 ```bash
 /usecase-factory:run <slug> <one-line idea + target market>
 ```
@@ -136,6 +142,8 @@ Constraints:
 - Make the command at the end usable by replacing <slug> with the actual slug.
 PROMPT_EOF
 )
+
+FORBIDDEN_ENGLISH_HEADINGS='^## (One-liner|Market problem signal|Target user|Pain hypothesis|Agent fit|Agent flow|Control surface|Control surface / user flow|MVP scope|Risk questions|Risk questions for usecase-factory|Factory command)[[:space:]]*$'
 
 {
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Generating daily agent-app idea"
@@ -153,6 +161,15 @@ PROMPT_EOF
     --permission-mode "$CLAUDE_PERMISSION_MODE" \
     "$PROMPT"
 ) >"$TMP_FILE" 2>>"$LOG_FILE"
+
+if grep -Eq "$FORBIDDEN_ENGLISH_HEADINGS" "$TMP_FILE"; then
+  {
+    echo "Output rejected: found old English section headings."
+    echo "Please rerun after adjusting the generator prompt or model output."
+  } | tee -a "$LOG_FILE" >&2
+  rm -f "$TMP_FILE"
+  exit 65
+fi
 
 SLUG="$(
   awk '
