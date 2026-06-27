@@ -6,6 +6,7 @@ CLAUDE_BIN="${CLAUDE_BIN:-claude}"
 CLAUDE_MODEL="${CLAUDE_MODEL:-sonnet}"
 CLAUDE_EFFORT="${CLAUDE_EFFORT:-high}"
 CLAUDE_PERMISSION_MODE="${CLAUDE_PERMISSION_MODE:-bypassPermissions}"
+DAILY_AGENT_IDEA_AUTO_PUSH="${DAILY_AGENT_IDEA_AUTO_PUSH:-1}"
 OUT_DIR="${DAILY_AGENT_IDEA_DIR:-$ROOT_DIR/doc/daily-agent-app-ideas}"
 LOG_DIR="${DAILY_AGENT_IDEA_LOG_DIR:-$ROOT_DIR/logs/cron}"
 DATE_UTC="$(date -u +%F)"
@@ -150,5 +151,25 @@ mv "$TMP_FILE" "$OUT_FILE"
   echo "created=$OUT_FILE"
   echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Done"
 } | tee -a "$LOG_FILE"
+
+if [[ "$DAILY_AGENT_IDEA_AUTO_PUSH" == "1" ]]; then
+  {
+    echo
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Staging daily idea seed"
+  } | tee -a "$LOG_FILE"
+
+  (
+    cd "$ROOT_DIR"
+    git add -f "$OUT_FILE"
+
+    if git diff --cached --quiet -- "$OUT_FILE"; then
+      echo "No daily idea seed changes to commit"
+      exit 0
+    fi
+
+    git commit -m "Add daily agent app idea seed for $DATE_UTC"
+    git push origin HEAD
+  ) 2>&1 | tee -a "$LOG_FILE"
+fi
 
 printf '%s\n' "$OUT_FILE"
