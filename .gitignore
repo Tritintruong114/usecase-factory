@@ -15,3 +15,4 @@ npm-debug.log*
 # Generated research outputs (use-case dossiers/docs are produced at runtime)
 doc/
 output/
+logs/
