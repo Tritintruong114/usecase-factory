@@ -7,6 +7,7 @@ CLAUDE_MODEL="${CLAUDE_MODEL:-sonnet}"
 CLAUDE_EFFORT="${CLAUDE_EFFORT:-high}"
 CLAUDE_PERMISSION_MODE="${CLAUDE_PERMISSION_MODE:-bypassPermissions}"
 DAILY_AGENT_IDEA_AUTO_PUSH="${DAILY_AGENT_IDEA_AUTO_PUSH:-1}"
+DAILY_AGENT_IDEA_BRANCH="${DAILY_AGENT_IDEA_BRANCH:-main}"
 OUT_DIR="${DAILY_AGENT_IDEA_DIR:-$ROOT_DIR/doc/daily-agent-app-ideas}"
 LOG_DIR="${DAILY_AGENT_IDEA_LOG_DIR:-$ROOT_DIR/logs/cron}"
 DATE_UTC="$(date -u +%F)"
@@ -211,6 +212,15 @@ if [[ "$DAILY_AGENT_IDEA_AUTO_PUSH" == "1" ]]; then
 
   (
     cd "$ROOT_DIR"
+
+    # Commit the seed directly onto the target branch (default: main) and push
+    # there. Seeds live under the gitignored doc/, so switching branches never
+    # disturbs the generated file in the working tree. We fast-forward to the
+    # remote first so the commit lands on top of the latest main.
+    git fetch origin "$DAILY_AGENT_IDEA_BRANCH"
+    git checkout "$DAILY_AGENT_IDEA_BRANCH"
+    git merge --ff-only "origin/$DAILY_AGENT_IDEA_BRANCH" || true
+
     git add -f "$OUT_FILE"
 
     if git diff --cached --quiet -- "$OUT_FILE"; then
@@ -219,7 +229,7 @@ if [[ "$DAILY_AGENT_IDEA_AUTO_PUSH" == "1" ]]; then
     fi
 
     git commit -m "Add daily agent app idea seed for $DATE_UTC"
-    git push origin HEAD
+    git push origin "$DAILY_AGENT_IDEA_BRANCH"
   ) 2>&1 | tee -a "$LOG_FILE"
 fi
 
