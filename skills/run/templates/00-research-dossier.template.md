@@ -146,7 +146,7 @@ Chấm theo cây (đúng thứ tự), chọn ĐÚNG MỘT:
 KHÔNG mặc định bừa (cả Proceed lẫn Narrow).
 -->
 
-- **Quyết định:** `<Proceed to /grill-to-brief | Pivot use-case | Narrow buyer/market | Kill>`
+- **Quyết định:** `<Proceed to /usecase-factory:grill-to-brief | Pivot use-case | Narrow buyer/market | Kill>`
 - **Rationale:** `<2–4 câu vì sao — dựa pain intensity, agent fit, workaround strength, WTP signal>`
 - **Confidence:** `<High / Medium / Low>`
 - **Top evidence IDs:** `<E# E# E# — bằng chứng chống lưng quyết định>`
@@ -156,12 +156,12 @@ KHÔNG mặc định bừa (cả Proceed lẫn Narrow).
 ## 9. Handoff Recommendation
 
 <!--
-Bàn giao cho /grill-to-brief — KHÔNG khung "tự động biến thành screen brief".
-/grill-to-brief CÓ QUYỀN reject / kill / narrow / pivot use-case. Liệt kê đúng cái grill phải chất vấn.
+Bàn giao cho /usecase-factory:grill-to-brief — KHÔNG khung "tự động biến thành screen brief".
+/usecase-factory:grill-to-brief CÓ QUYỀN reject / kill / narrow / pivot use-case. Liệt kê đúng cái grill phải chất vấn.
 -->
 
 - **Trạng thái:** `<đủ 4 input + dossier sẵn sàng cho grill / chưa đủ — lý do>`
-- **`/grill-to-brief` được phép:** reject · kill · narrow · pivot — KHÔNG mặc định convert thành screen-brief.
+- **`/usecase-factory:grill-to-brief` được phép:** reject · kill · narrow · pivot — KHÔNG mặc định convert thành screen-brief.
 - **Grill phải chất vấn trước (theo thứ tự rủi ro):**
   - [ ] Buyer rõ chưa (ai ký tiền)?
   - [ ] Pain đủ mạnh (intensity + frequency)?
@@ -170,4 +170,4 @@ Bàn giao cho /grill-to-brief — KHÔNG khung "tự động biến thành scree
   - [ ] Data / integration feasibility?
   - [ ] GTM path (đường ra thị trường)?
   - [ ] Substitute/workaround (§5) có quá mạnh không?
-- **Chạy tiếp (chỉ khi Decision = Proceed):** `/grill-to-brief <slug>`
+- **Chạy tiếp (chỉ khi Decision = Proceed):** `/usecase-factory:grill-to-brief <slug>`

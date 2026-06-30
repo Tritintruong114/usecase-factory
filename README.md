@@ -2,13 +2,15 @@
 
 > **ClawExperts packages expert workflows into installable AI-agent plugins.**
 
-A Claude Code plugin (`usecase-factory`) that turns an **AI Agent use-case idea** into a research dossier, four research docs, and a clear **Proceed / Pivot / Narrow / Kill** decision.
+A Claude Code plugin (`usecase-factory`) that takes an **AI Agent use-case idea** all the way from market research to a self-contained, reviewable screen prototype — with a clear **Proceed / Pivot / Narrow / Kill** decision gating the way.
 
-It is the market-research-and-decision stage that sits *before* you design any screens. Given an idea plus a target market, it spawns parallel web-research worker agents, layers their findings (must-cite / infer / assumption) into a single dossier that becomes the source of truth, synthesizes four downstream-ready research docs, and then **renders a verdict** at a Decision Gate. It deliberately does **not** design screens, map jobs to UI, or build a screen-brief — those are downstream steps.
+Give it an idea plus a target market and it runs the full pipeline: spawn parallel web-research worker agents → layer their findings (must-cite / infer / assumption) into a single dossier that becomes the source of truth → synthesize four research docs → **render a verdict** at a Decision Gate → (on Proceed) grill the research into a justified screen brief → draw ASCII wireframes → render a self-contained HTML prototype → emit a handoff package. It stops short of real backend code and an FE↔BE contract — that is Phase-2 FE, a later step.
 
-## What it produces
+The pipeline is staged, so you can also stop at any gate (research-only, decision-only, or screen-brief-only) and hand off from there.
 
-For a given `<slug>`, into `doc/ws-<slug>/`:
+## What the research stage produces
+
+The research-and-decision stage (`/usecase-factory:run`) writes, for a given `<slug>`, into `doc/ws-<slug>/`:
 
 | File | What it is |
 |---|---|
@@ -18,6 +20,20 @@ For a given `<slug>`, into `doc/ws-<slug>/`:
 | `Target-User-<slug>.md` | The persona — the lens every later screen is judged through. |
 | `MVP-Coreloop.md` | The value core loop, v0 scope, and the cut line. |
 | **A verdict** | **Proceed / Pivot / Narrow / Kill**, with rationale, confidence, top evidence IDs, and the biggest unresolved risk. |
+
+## Final output — the handoff package
+
+When the full pipeline runs through to rendering, the deliverable is a self-explaining **handoff package** in `doc/ws-<slug>/`, not a loose pile of files:
+
+| Artifact | Role | Receiver |
+|---|---|---|
+| **`mockups.html` + `mockups.data.js`** | headline viewable prototype — **an inseparable pair** | non-tech review · future web-app prototype |
+| `screens-brief.md` | the justified screen set (each screen traces to one job) + flows + coverage | spec |
+| `mockups.md` | ASCII map — the coverage GATE | Phase-2 FE dev |
+| `_research/dossier.md` + the 4 research docs | evidence + the Decision Gate verdict | "why it's worth building" |
+| `HANDOFF.md` | the index that ties it together: verdict, read-order, scope boundaries, next step per receiver | read FIRST |
+
+> ⚠ **`mockups.html` and `mockups.data.js` travel together.** The `.html` loads the data via `<script src="mockups.data.js">` (relative path), so both must stay in the same folder — emailing/zipping/uploading the `.html` alone renders blank. "Self-contained" means self-contained **as a pair**. `HANDOFF.md` (emitted by `mockup-to-html` as the terminal step) makes the whole folder pick-up-able without questions.
 
 ## What's inside the plugin
 
@@ -37,6 +53,20 @@ usecase-factory/
         02-mr-problem-solution.template.md
         03-target-user.template.md
         04-mvp-coreloop.template.md
+    grill-to-brief/
+      SKILL.md                 # thin router → the command /grill-to-brief
+      playbook.md              # the full 7-step execution guide (read first)
+      templates/
+        05-screens-brief.template.md
+    copy-writer/               # UX microcopy — invoked by grill-to-brief step 7
+      SKILL.md
+    design-a-screen/           # screens-brief.md → ASCII wireframes
+      SKILL.md
+    mockup-to-html/            # ASCII wireframe → static HTML viewer + handoff index
+      SKILL.md
+      assets/                  # template.html + example.data.js + HANDOFF.template.md
+    use-case-brief/            # OPTIONAL upstream — rough idea → validated brief.md seed
+      SKILL.md
   agents/
     market-sizing-researcher.md         # worker A — market size & context
     jtbd-pain-researcher.md             # worker B — jobs-to-be-done & pain
@@ -105,8 +135,9 @@ A few rules are load-bearing — they are what make the output trustworthy:
 ## Development status
 
 - **v0.1.0** — local plugin MVP.
-- **1 skill** (`run`) + **5 agents** (4 research workers + 1 adversarial decision-gate reviewer).
-- Tested locally with `claude --plugin-dir .` (skill + all 5 agents discovered via `claude plugin details`).
+- **6 skills** — the pipeline `[use-case-brief] → run → grill-to-brief → design-a-screen → mockup-to-html`, plus `copy-writer` (microcopy, invoked by grill-to-brief) — + **5 agents** (4 research workers + 1 adversarial decision-gate reviewer). `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). The pipeline terminates at the self-contained handoff package; the live interactive prototype (which needs a dev environment) is intentionally left to the dev repo.
+- Tested locally with `claude --plugin-dir .` (skills + all 5 agents discovered via `claude plugin details`).
+- **`mockup-to-html` reads a style reference** for its tokens — resolved in order: a reference you name → `$DESIGN_SYSTEM_ROOT` → the repo default `new-design/` → neutral default tokens if none exists. The tokens are inlined into `mockups.html`, so the output stays self-contained regardless. Every skill runs from `doc/ws-<slug>/` (plus, for `mockup-to-html`, the optional style reference).
 - **npm-ready but not published** — no package will be pushed unless the maintainer explicitly confirms.
 
 ## Publishing
@@ -118,6 +149,14 @@ npm publish --access public
 ```
 
 The published tarball ships `.claude-plugin/`, `skills/`, `agents/`, `scripts/`, and this README. The same folder can also be distributed via a Claude plugin marketplace.
+
+## Contributing
+
+Contributions are welcome. The plugin is built from Markdown skills + agents (no app code) and a
+few bash validators. Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the contribution contract —
+the thin-router + playbook skill shape, the read-only research agents, the template/validator
+heading contract, the load-bearing evidence rules, and the pre-PR checklist. For plugin
+architecture and the developer guide, see [`CLAUDE.md`](./CLAUDE.md).
 
 ## License
 
