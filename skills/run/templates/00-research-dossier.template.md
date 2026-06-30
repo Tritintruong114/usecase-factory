@@ -170,4 +170,4 @@ Bàn giao cho /usecase-factory:grill-to-brief — KHÔNG khung "tự động bi�
   - [ ] Data / integration feasibility?
   - [ ] GTM path (đường ra thị trường)?
   - [ ] Substitute/workaround (§5) có quá mạnh không?
-- **Chạy tiếp (chỉ khi Decision = Proceed):** `/usecase-factory:grill-to-brief <slug>`
+- **Chạy tiếp (chỉ khi Decision = Proceed):** `/usecase-factory:agent-domain-spec <slug>` (agent-hóa nghiệp vụ → OpenClaw), rồi `/usecase-factory:grill-to-brief <slug>` (screen brief = projection của spec).

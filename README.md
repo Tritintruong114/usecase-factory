@@ -4,9 +4,16 @@
 
 A Claude Code plugin (`usecase-factory`) that takes an **AI Agent use-case idea** all the way from market research to a self-contained, reviewable screen prototype — with a clear **Proceed / Pivot / Narrow / Kill** decision gating the way.
 
-Give it an idea plus a target market and it runs the full pipeline: spawn parallel web-research worker agents → layer their findings (must-cite / infer / assumption) into a single dossier that becomes the source of truth → synthesize four research docs → **render a verdict** at a Decision Gate → (on Proceed) grill the research into a justified screen brief → draw ASCII wireframes → render a self-contained HTML prototype → emit a handoff package. It stops short of real backend code and an FE↔BE contract — that is Phase-2 FE, a later step.
+Give it an idea plus a target market and it runs the full pipeline: spawn parallel web-research worker agents → layer their findings (must-cite / infer / assumption) into a single dossier that becomes the source of truth → synthesize four research docs → **render a verdict** at a Decision Gate → (on Proceed) design the **Agent Domain Spec** — how the nghiệp-vụ gets agent-ised and runs on OpenClaw primitives — → grill that into a justified screen brief → draw ASCII wireframes → render a self-contained HTML prototype → emit a handoff package. It stops short of real backend code and an FE↔BE contract — that is Phase-2 FE, a later step.
 
-The pipeline is staged, so you can also stop at any gate (research-only, decision-only, or screen-brief-only) and hand off from there.
+```
+Use-case idea → Research dossier → MVP core loop → Agent Domain Spec → Screen brief → ASCII → HTML → OpenClaw implementation
+   (seed)         (run + Decision Gate)            (agent-domain-spec)   (grill-to-brief) (design-a-screen) (brief-to-html)  (Phase-2, outside the plugin)
+```
+
+For **Agent Apps** the **Agent Domain Spec** stage is what stops the pipeline from jumping straight from a core loop to UI: it specs how the business is agent-ised (which objects the agent watches, their lifecycle, how it classifies intent, when it acts vs asks vs stays silent, which tools it may call, which actions need human approval, which guardrails block risk, what user feedback updates) and maps each part onto OpenClaw primitives — *before* any screen is drawn. The screen brief is then a **projection** of that spec.
+
+The pipeline is staged, so you can also stop at any gate (research-only, decision-only, domain-spec-only, or screen-brief-only) and hand off from there.
 
 ## What the research stage produces
 
@@ -28,7 +35,8 @@ When the full pipeline runs through to rendering, the deliverable is a self-expl
 | Artifact | Role | Receiver |
 |---|---|---|
 | **`mockups.html` + `mockups.data.js`** | headline viewable prototype — **an inseparable pair** | non-tech review · future web-app prototype |
-| `screens-brief.md` | the justified screen set (each screen traces to one job) + flows + coverage | spec |
+| `Agent-Domain-Spec.md` | how the nghiệp-vụ is agent-ised: objects, lifecycle, intents, signals, decision/approval policy, guardrails, learning loop, background jobs, + the OpenClaw implementation map | Phase-2 dev · OpenClaw build |
+| `screens-brief.md` | the justified screen set (each screen traces to one job + one slice of the domain spec) + flows + coverage | spec |
 | `mockups.md` | ASCII map — the coverage GATE | Phase-2 FE dev |
 | `_research/dossier.md` + the 4 research docs | evidence + the Decision Gate verdict | "why it's worth building" |
 | `HANDOFF.md` | the index that ties it together: verdict, read-order, scope boundaries, next step per receiver | read FIRST |
@@ -53,6 +61,11 @@ usecase-factory/
         02-mr-problem-solution.template.md
         03-target-user.template.md
         04-mvp-coreloop.template.md
+    agent-domain-spec/         # research + core loop → Agent-Domain-Spec.md (how the nghiệp-vụ is agent-ised on OpenClaw)
+      SKILL.md                 # thin router → the command /usecase-factory:agent-domain-spec
+      playbook.md              # the full 7-step execution guide (read first)
+      templates/
+        06-agent-domain-spec.template.md
     grill-to-brief/
       SKILL.md                 # thin router → the command /grill-to-brief
       playbook.md              # the full 7-step execution guide (read first)
@@ -73,10 +86,13 @@ usecase-factory/
     competitor-substitute-researcher.md # worker C — competitors + every substitute
     persona-wtp-researcher.md           # worker D — persona & willingness-to-pay
     decision-gate-reviewer.md           # adversarial reviewer of the verdict
+    domain-modeler-agent.md             # extracts objects/lifecycle/intent/decisions for the Agent Domain Spec
+    agent-logic-reviewer.md             # adversarial reviewer of the Agent Domain Spec (over-automation, missing approval, trust risk)
   scripts/
-    validate-dossier.sh        # checks the dossier heading contract
-    coverage-check.sh          # checks the 4 output docs exist + are placeholder-free
-    extract-design-tokens.sh   # bundled-HTML design system → paste-ready tokens.css
+    validate-dossier.sh             # checks the dossier heading contract
+    coverage-check.sh               # checks the 4 output docs exist + are placeholder-free
+    validate-agent-domain-spec.sh   # checks the Agent Domain Spec heading contract (§0–§19)
+    extract-design-tokens.sh        # bundled-HTML design system → paste-ready tokens.css
   design-system/               # bundled DEMO design system (NOT shipped; teams point at their own)
     Openclaw_Design_System.html
 ```
@@ -117,12 +133,14 @@ If you omit the idea, the skill looks for `doc/ws-<slug>/brief.md`, then asks up
 The skill runs these automatically before finishing; you can also run them by hand:
 
 ```bash
-bash scripts/validate-dossier.sh doc/ws-<slug>/_research/dossier.md
-bash scripts/coverage-check.sh   doc/ws-<slug> <slug>
+bash scripts/validate-dossier.sh            doc/ws-<slug>/_research/dossier.md
+bash scripts/coverage-check.sh              doc/ws-<slug> <slug>
+bash scripts/validate-agent-domain-spec.sh  doc/ws-<slug>/Agent-Domain-Spec.md
 ```
 
 - `validate-dossier.sh` — confirms the dossier carries sections 0–9, an Evidence Table, and a Decision Gate verdict.
 - `coverage-check.sh` — confirms the four output docs exist and have no leftover placeholders (`<placeholder>`, `TODO`, guidance comments, etc.).
+- `validate-agent-domain-spec.sh` — confirms the Agent Domain Spec carries all sections §0–§19, an approval classification (auto / cần duyệt / cấm), guardrails, and the OpenClaw implementation map.
 
 ## Design system
 
@@ -146,9 +164,9 @@ A few rules are load-bearing — they are what make the output trustworthy:
 
 ## Development status
 
-- **v0.2.0** — local plugin MVP.
-- **6 skills** — the pipeline `[use-case-brief] → run → grill-to-brief → design-a-screen → brief-to-html`, plus `copy-writer` (microcopy, invoked by grill-to-brief), + **5 agents** (4 research workers + 1 adversarial decision-gate reviewer). `design-a-screen` (ASCII) and `brief-to-html` (HTML) both branch off the screen brief: the ASCII is the human-alignment artifact + coverage gate, while `brief-to-html` renders from the brief + [design system](#design-system) and only cross-checks coverage against the ASCII. `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). The pipeline terminates at the self-contained handoff package; the live interactive prototype (which needs a dev environment) is intentionally left to the dev repo.
-- Tested locally with `claude --plugin-dir .` (skills + all 5 agents discovered via `claude plugin details`).
+- **v0.3.0** — local plugin MVP.
+- **7 skills** — the pipeline `[use-case-brief] → run → agent-domain-spec → grill-to-brief → design-a-screen → brief-to-html`, plus `copy-writer` (microcopy, invoked by grill-to-brief), + **7 agents** (4 research workers + 1 adversarial decision-gate reviewer + `domain-modeler-agent` and the adversarial `agent-logic-reviewer` for the Agent Domain Spec). `agent-domain-spec` sits between `run` and `grill-to-brief`: it turns the research + core loop into `Agent-Domain-Spec.md` (how the nghiệp-vụ is agent-ised on OpenClaw) so the pipeline doesn't jump from a core loop straight to UI. `design-a-screen` (ASCII) and `brief-to-html` (HTML) both branch off the screen brief: the ASCII is the human-alignment artifact + coverage gate, while `brief-to-html` renders from the brief + [design system](#design-system) and only cross-checks coverage against the ASCII. `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). The pipeline terminates at the self-contained handoff package; the live interactive prototype + the real OpenClaw build (which need a dev environment) are intentionally left to the dev repo.
+- Tested locally with `claude --plugin-dir .` (skills + all 7 agents discovered via `claude plugin details`).
 - **npm-ready but not published** — no package will be pushed unless the maintainer explicitly confirms.
 
 ## Publishing

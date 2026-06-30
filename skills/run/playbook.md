@@ -212,7 +212,8 @@ List: `_research/dossier.md` + the 4 output files + any open pre-check flags + t
 
 Hand off downstream — NOT as an "auto-convert into screen brief" frame:
 
-- The downstream grill **may reject · kill · narrow · pivot** the use-case. It does NOT default-convert the dossier into a screen-brief.
+- **Next stage on Proceed is `/usecase-factory:agent-domain-spec`** (the Agent Domain Spec — how the nghiệp-vụ gets agent-ised on OpenClaw), which THEN feeds `/usecase-factory:grill-to-brief`. Don't jump straight from the core loop to a screen brief for an Agent App.
+- The downstream stages **may reject · kill · narrow · pivot** the use-case. They do NOT default-convert the dossier into a screen-brief.
 - The grill must **interrogate first** (in risk order): buyer clarity · pain intensity · willingness-to-pay · agent fit · data/integration feasibility · GTM path · substitute/workaround strength.
 - Only continue when **Decision = Proceed**.
 

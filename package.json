@@ -1,6 +1,6 @@
 {
   "name": "@clawexperts/claude-usecase-factory",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Claude Code plugin for ClawExperts Use-Case Factory: research AI Agent product ideas and produce a Proceed/Pivot/Narrow/Kill decision.",
   "keywords": [
     "claude",
@@ -23,6 +23,7 @@
   "scripts": {
     "validate:dossier": "bash scripts/validate-dossier.sh",
     "validate:coverage": "bash scripts/coverage-check.sh",
+    "validate:agent-domain-spec": "bash scripts/validate-agent-domain-spec.sh",
     "extract:tokens": "bash scripts/extract-design-tokens.sh"
   }
 }

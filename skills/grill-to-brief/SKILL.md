@@ -11,11 +11,13 @@ Skill này là **router mỏng**. Toàn bộ logic thực thi nằm trong `playb
 ## Vị trí trong pipeline
 
 ```
-/usecase-factory:run ──▶ 4 doc research ──/usecase-factory:grill-to-brief──▶ screens-brief.md ──/usecase-factory:design-a-screen──▶ mockups (ASCII)
-                                            (skill này: ra SPEC, KHÔNG phải ASCII)
+/usecase-factory:run ─▶ 4 doc research ─/usecase-factory:agent-domain-spec─▶ Agent-Domain-Spec.md ─/usecase-factory:grill-to-brief─▶ screens-brief.md ─▶ design-a-screen (ASCII)
+                                              (nghiệp-vụ-agent)                                       (skill này: ra SPEC UI, KHÔNG phải ASCII)
 ```
 
-`grill-to-brief` = **cầu nối research → wireframe**. Nó ra một SPEC (bộ màn đã biện minh), KHÔNG phải ASCII. Nó **được phép reject · kill · narrow · pivot** — KHÔNG tự động biến research thành màn.
+`grill-to-brief` = **cầu nối nghiệp-vụ-agent → wireframe**. Nó ra một SPEC (bộ màn đã biện minh), KHÔNG phải ASCII. Nó **được phép reject · kill · narrow · pivot** — KHÔNG tự động biến research thành màn.
+
+**Input chính = `Agent-Domain-Spec.md`** (output của `/usecase-factory:agent-domain-spec`): screen brief phải là **PROJECTION của spec đó** — mỗi màn surface một phần của nghiệp-vụ-agent (object/state cần thấy, decision/approval cần bề mặt, background job cần thông báo). KHÔNG tự phát minh nghiệp vụ. Nếu workspace **chưa có** `Agent-Domain-Spec.md` (workspace cũ) → **cảnh báo mạnh** rằng brief sẽ nông (bịa nghiệp vụ từ 4 doc) và **đề xuất chạy `/usecase-factory:agent-domain-spec` trước**; vẫn cho fallback về 4 doc research nếu user xác nhận.
 
 ## STEP 0 — đọc playbook trước (bắt buộc)
 
@@ -29,12 +31,13 @@ Template để điền vào `screens-brief.md` nằm tại `${CLAUDE_PLUGIN_ROOT
 /usecase-factory:grill-to-brief <slug>
 ```
 
-- Đọc cả 4 doc research từ `doc/ws-<slug>/` (+ `brief.md` nếu có) TRƯỚC. Thiếu một loại → nói rõ thiếu cái nào và dừng.
+- Đọc `Agent-Domain-Spec.md` (input chính, nếu có) + cả 4 doc research từ `doc/ws-<slug>/` (+ `brief.md` nếu có) TRƯỚC. Thiếu một loại doc research → nói rõ thiếu cái nào và dừng. Thiếu `Agent-Domain-Spec.md` → cảnh báo mạnh + đề xuất chạy `/usecase-factory:agent-domain-spec` trước, fallback 4 doc nếu user xác nhận.
 - Grill **từng màn một**, recommend-rồi-chờ. Gate decision (screen-set, screen-hay-không, lỗ hổng coverage, cut line) không bao giờ tự điền âm thầm — nêu + confirm từng cái.
 - Viết `doc/ws-<slug>/screens-brief.md` tăng dần (đừng dồn).
 
 ## Boundaries (tóm tắt — chi tiết ở playbook)
 
 - KHÔNG vẽ ASCII — đó là `/usecase-factory:design-a-screen`.
+- KHÔNG phát minh nghiệp vụ. Có `Agent-Domain-Spec.md` → màn là projection của spec đó; không thêm decision/action/state nghiệp vụ mà spec không có.
 - KHÔNG bịa màn research không đỡ; không orphan screen, không job CAO bị hở, không dead-end CTA.
 - KHÔNG ship brief thiếu flows + MVP cut line.

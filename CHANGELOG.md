@@ -9,6 +9,21 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to choose a version bump.
 ## [Unreleased]
 
 ### Added
+- **New pipeline stage `agent-domain-spec`** (skill + playbook) between `run` and `grill-to-brief`.
+  Turns the research dossier + MVP core loop into `Agent-Domain-Spec.md` — how the nghiệp-vụ is
+  agent-ised: domain thesis, human/agent/tool role split, core objects, object lifecycle/state
+  machine, intent taxonomy, signals, eligibility rules, decision policy, priority/scoring,
+  confidence & uncertainty, approval policy (auto/cần duyệt/cấm), tool/action policy, draft/content
+  policy, guardrails/anti-abuse/trust boundaries, learning loop, background jobs, an **OpenClaw
+  implementation map** (skills/tools/connectors/memory/sessions/cron/approval/guardrails/workspace
+  state), metrics, and open questions (§0–§19). The screen brief is now a *projection* of this spec.
+- Template `06-agent-domain-spec.template.md` (the §0–§19 heading contract).
+- Validator `scripts/validate-agent-domain-spec.sh` (+ `npm run validate:agent-domain-spec`) — checks
+  §0–§19, the approval layering (auto/cần duyệt/cấm), guardrails, and the OpenClaw map.
+- Two agents for the new stage: `domain-modeler-agent` (extracts objects/lifecycle/intent/signals/
+  decision-points from the research) and the adversarial `agent-logic-reviewer` (hunts
+  over-automation, missing approval gates, ambiguous states, thin guardrails, trust risk, and
+  spec↔screen-brief mismatch). Both read-only.
 - `CONTRIBUTING.md` — contribution contract (thin-router + playbook skill shape, read-only
   research agents, template/validator heading contract, SemVer policy, pre-PR checklist).
 - `CLAUDE.md` — developer guide for the plugin.
@@ -21,6 +36,11 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to choose a version bump.
   copy-paste payload for an external generator).
 
 ### Changed
+- **`grill-to-brief` now consumes `Agent-Domain-Spec.md` as its primary input** — the screen brief
+  is a projection of the agent domain spec, not invented business. Backward-compatible: if the spec
+  is missing (older workspaces), it warns strongly and falls back to the 4 research docs. `run` and
+  the dossier handoff now route Proceed → `agent-domain-spec` → `grill-to-brief`.
+- Version bumped `0.2.0` → `0.3.0` (new backward-compatible stage).
 - **Renamed `mockup-to-html` → `brief-to-html`** and flipped its primary input from the ASCII
   map to the screen brief. The prototype's *look* now comes from the brief's intent skinned by
   the design system; the ASCII (`mockups.md`) is demoted to a coverage cross-check only. This

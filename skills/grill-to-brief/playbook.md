@@ -2,20 +2,25 @@
 
 **Guide thực thi chính thức.** Skill router `/usecase-factory:grill-to-brief` chỉ trỏ về file này; mọi logic chạy ở đây. Đọc hết trước khi chạy.
 
-Nhiệm vụ: biến 4 doc research thành một **Screen Brief** — bộ màn mà **mỗi màn phải tự kiếm chỗ đứng bằng cách giải đúng MỘT job, nhìn từ góc của target user**. Đây là cầu nối research → wireframe; chạy TRƯỚC `/usecase-factory:design-a-screen`. Output là **SPEC** (danh sách màn đã biện minh), KHÔNG phải ASCII — `/usecase-factory:design-a-screen` mới vẽ ASCII từ brief này, rồi `/usecase-factory:brief-to-html` render HTML, rồi mới dựng prototype.
+Nhiệm vụ: biến **Agent Domain Spec + 4 doc research** thành một **Screen Brief** — bộ màn mà **mỗi màn phải tự kiếm chỗ đứng bằng cách giải đúng MỘT job, nhìn từ góc của target user**, và **surface một phần của nghiệp-vụ-agent đã chốt trong `Agent-Domain-Spec.md`**. Đây là cầu nối nghiệp-vụ-agent → wireframe; chạy TRƯỚC `/usecase-factory:design-a-screen`. Output là **SPEC** (danh sách màn đã biện minh), KHÔNG phải ASCII — `/usecase-factory:design-a-screen` mới vẽ ASCII từ brief này, rồi `/usecase-factory:brief-to-html` render HTML, rồi mới dựng prototype.
+
+> **Screen brief là PROJECTION của Agent Domain Spec.** OpenClaw chạy nghiệp vụ; spec (`Agent-Domain-Spec.md`) là SOP nghiệp vụ; brief này là cách user *nhìn thấy và điều khiển* nghiệp vụ đó. Mỗi màn chiếu một lát của spec: object/state user cần thấy (§3/§4), decision/approval cần một bề mặt (§8/§11), background job cần một thông báo (§16). KHÔNG phát minh decision/action/state nghiệp vụ mà spec không có — nếu thấy thiếu, đẩy ngược về `/usecase-factory:agent-domain-spec`, đừng tự chế ở đây.
 
 ```mermaid
 flowchart TD
-    R["4 doc research<br/>Context & Problem · MR/JTBD · Target User · MVP-Coreloop"] --> G["/usecase-factory:grill-to-brief<br/>(playbook này — ra SPEC)"]
+    ADS["Agent-Domain-Spec.md<br/>(nghiệp-vụ-agent: object · lifecycle · decision · approval · jobs)"] --> G["/usecase-factory:grill-to-brief<br/>(playbook này — ra SPEC UI = projection)"]
+    R["4 doc research<br/>Context & Problem · MR/JTBD · Target User · MVP-Coreloop"] --> G
     G --> SB["screens-brief.md<br/>(bộ màn đã biện minh)"]
     SB --> DS["/usecase-factory:design-a-screen → mockups.md (ASCII)"]
     DS --> MH["/usecase-factory:brief-to-html → mockups.html (HTML)"]
     MH --> PT["prototype (bước dev, ngoài plugin)"]
 ```
 
-KHÔNG brainstorm tính năng. Lấy đúng cái research nói user cần, rồi ép từng màn ứng viên cho tới khi nó hoặc tự biện minh được trước một job thật, hoặc bị cắt.
+KHÔNG brainstorm tính năng. Lấy đúng cái spec + research nói user cần, rồi ép từng màn ứng viên cho tới khi nó hoặc tự biện minh được trước một job thật + một lát của spec, hoặc bị cắt.
 
-## Input (đọc cả 4 trước tiên)
+## Input (đọc Agent Domain Spec + cả 4 doc trước tiên)
+
+> **Input chính = `Agent-Domain-Spec.md`.** Đọc nó TRƯỚC: nó định nghĩa nghiệp vụ agent đã được agent-hóa thế nào (object/state/decision/approval/job). Mọi màn trace về một lát của spec này. **Thiếu `Agent-Domain-Spec.md`** (workspace cũ, chạy trước khi có tầng này) → **CẢNH BÁO MẠNH**: brief sẽ nông vì phải tự suy nghiệp vụ từ 4 doc, dễ bịa decision/approval/state không có thật. Đề xuất user chạy `/usecase-factory:agent-domain-spec <slug>` trước. Nếu user xác nhận chạy tiếp → **fallback** về 4 doc research (vẫn được, nhưng ghi rõ trong brief là "không có Agent Domain Spec — nghiệp vụ suy từ research, cần spec hóa sau").
 
 Đọc từ `doc/ws-<slug>/` (hoặc nơi user chỉ) TRƯỚC khi hỏi bất cứ gì:
 
@@ -207,6 +212,7 @@ Bước này là một LỚP copy phủ lên spec, không phải vẽ lại — 
 - **KHÔNG để màn phục vụ zero job** (orphan) hay **để job CAO phục vụ zero màn** (lỗ hổng) — two-way coverage check là cổng, chạy nó.
 - **KHÔNG mặc định mọi thứ thành màn.** Với user non-tech, ghé hiếm, một notification hay hành động một-chạm thường thắng một màn. Bắt mỗi màn thắng cuộc tranh luận đó.
 - **KHÔNG bịa màn research không đỡ.** Trace mọi màn về một JTBD/pain trong doc; không có trong doc thì không vào v0.
+- **KHÔNG phát minh nghiệp vụ ngoài Agent Domain Spec.** Có `Agent-Domain-Spec.md` → mỗi màn là projection của một lát spec (object/state §3-4, decision/approval §8/§11, job §16). Thấy cần một decision/action/state spec không có → đẩy ngược về `/usecase-factory:agent-domain-spec`, đừng tự chế logic nghiệp vụ ở tầng UI.
 - **KHÔNG bỏ qua state non-happy** — empty/first-run/error là chỗ layout thật sự phải chạy được.
 - **KHÔNG để CTA thiếu state kết quả.** Mọi hành động gọi tên state hoặc màn nó sinh (bước 5); kết quả không khai = nút chết downstream. Coverage check Actions→destinations là cổng.
 - **KHÔNG ship brief thiếu flows.** Màn rời rạc chỉ-display-state là cái lỗ làm prototype trông "thiếu state / flow chưa xong". Vẽ chuỗi state-transition đầu-cuối (bước 5) — mọi job CAO trace qua một flow.
