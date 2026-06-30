@@ -2,14 +2,14 @@
 
 **Guide thực thi chính thức.** Skill router `/usecase-factory:grill-to-brief` chỉ trỏ về file này; mọi logic chạy ở đây. Đọc hết trước khi chạy.
 
-Nhiệm vụ: biến 4 doc research thành một **Screen Brief** — bộ màn mà **mỗi màn phải tự kiếm chỗ đứng bằng cách giải đúng MỘT job, nhìn từ góc của target user**. Đây là cầu nối research → wireframe; chạy TRƯỚC `/usecase-factory:design-a-screen`. Output là **SPEC** (danh sách màn đã biện minh), KHÔNG phải ASCII — `/usecase-factory:design-a-screen` mới vẽ ASCII từ brief này, rồi `/usecase-factory:mockup-to-html` render HTML, rồi mới dựng prototype.
+Nhiệm vụ: biến 4 doc research thành một **Screen Brief** — bộ màn mà **mỗi màn phải tự kiếm chỗ đứng bằng cách giải đúng MỘT job, nhìn từ góc của target user**. Đây là cầu nối research → wireframe; chạy TRƯỚC `/usecase-factory:design-a-screen`. Output là **SPEC** (danh sách màn đã biện minh), KHÔNG phải ASCII — `/usecase-factory:design-a-screen` mới vẽ ASCII từ brief này, rồi `/usecase-factory:brief-to-html` render HTML, rồi mới dựng prototype.
 
 ```mermaid
 flowchart TD
     R["4 doc research<br/>Context & Problem · MR/JTBD · Target User · MVP-Coreloop"] --> G["/usecase-factory:grill-to-brief<br/>(playbook này — ra SPEC)"]
     G --> SB["screens-brief.md<br/>(bộ màn đã biện minh)"]
     SB --> DS["/usecase-factory:design-a-screen → mockups.md (ASCII)"]
-    DS --> MH["/usecase-factory:mockup-to-html → mockups.html (HTML)"]
+    DS --> MH["/usecase-factory:brief-to-html → mockups.html (HTML)"]
     MH --> PT["prototype (bước dev, ngoài plugin)"]
 ```
 
@@ -27,6 +27,8 @@ KHÔNG brainstorm tính năng. Lấy đúng cái research nói user cần, rồi
 Có `brief.md` (từ `/usecase-factory:use-case-brief`) → đọc luôn; đừng suy lại cái nó đã chốt.
 
 Thiếu một trong bốn loại input → nói rõ thiếu cái nào và DỪNG — không thể neo màn nếu thiếu job list, persona, hay scope MVP/core-loop.
+
+**Design system (BẮT BUỘC, resolve ngay từ đầu).** Pipeline luôn cần một design system làm nguồn *skin* cho mọi render downstream. **Design system thường nằm NGOÀI repo này** — mỗi team một bộ ở repo/vị trí riêng; `design-system/` trong repo chỉ là bộ **DEMO** để chạy out-of-box. Resolve **vị trí** theo thứ tự: bộ user chỉ tên (thường là absolute path/URL ngoài repo) → `$DESIGN_SYSTEM_ROOT` → bộ demo `design-system/`. **Không resolve được bộ nào → DỪNG, hỏi user trỏ tới một design system** (path/URL/Figma/Storybook). Cấu trúc bộ **KHÔNG cố định** (có thể chỉ là 1 file HTML đóng gói như `design-system/Openclaw_Design_System.html`) — nên **liệt file trong bộ rồi HỎI user file nào dùng cho tokens, file nào cho component** (đừng đoán `src/index.css`/`ui.jsx`). Nếu bộ là HTML đóng gói, chạy `bash ${CLAUDE_PLUGIN_ROOT}/scripts/extract-design-tokens.sh <file>` để có `tokens.css` cạnh source rồi trỏ vào file đó. Ghi **đúng path đã chốt** vào mục `## Design system` của brief để `/usecase-factory:design-a-screen` và `/usecase-factory:brief-to-html` đọc thẳng, khỏi hỏi lại. KHÔNG fallback "neutral default" âm thầm — đó là chính nguyên nhân HTML ra xấu khi không có skin.
 
 ## Nguyên tắc (lý do tồn tại của skill)
 
@@ -74,7 +76,7 @@ Với mấy cái này: trình đáp án recommend VÀ chờ — doc nguồn dày
 3. **Job nào (cite J#).** "Phục vụ JTBD nào? ưu tiên bao nhiêu?" Không có → orphan → cắt hoặc hạ cấp.
 4. **Màn, hay không phải màn?** Thách mọi màn trước channel-split: "Cái này có thể là notification / một hành động trong chat / một route-call một-chạm thay vì màn không?" Nhất là với user non-tech, ghé hiếm — càng ít màn càng tốt. Một màn sống được chỉ khi user cần *thấy một tập thứ cùng lúc* hoặc *browse/so sánh* — cái chat không làm được.
 5. **Must-show + actions, mỗi cái kèm outcome.** "Lần paint đầu, cái gì BẮT BUỘC hiện? Hành động chính DUY NHẤT là gì?" Nhiều must-show hoặc nhiều action ngang hàng = màn quá tải. Rồi với MỖI hành động (chính + từng phụ), gọi tên **cái nó sinh ra** — state kết quả hoặc màn nó route tới (`Lưu kế hoạch → S2.first-run`, `Duyệt → S3.done`, `Ghi nhận đã góp → modal nhập → S2 cập nhật`). CTA không có kết quả khai = dead-end: khai kết quả hoặc cắt. Đây là cái làm state machine + flow thành thật, thay vì sketch chỉ-happy-path.
-6. **States — display VÀ outcome.** Hai loại, đều bắt buộc: (a) **display state** — empty / first-run / loading / error / done — cái nào quan trọng ở đây + mỗi cái trông ra sao (state non-happy là nơi màn vỡ; đừng bỏ qua); (b) **outcome state** — kết quả mỗi hành động ở bước 5 (xác nhận post-submit, validation-failed, dismissed, màn đã biến hình sau một CTA). Mọi state user thật chạm tới phải liệt ở đây — `/usecase-factory:design-a-screen` vẽ từng cái và `/usecase-factory:mockup-to-html` render mỗi cái thành một mục riêng, nên thiếu một state ở đây = thiếu khắp downstream.
+6. **States — display VÀ outcome.** Hai loại, đều bắt buộc: (a) **display state** — empty / first-run / loading / error / done — cái nào quan trọng ở đây + mỗi cái trông ra sao (state non-happy là nơi màn vỡ; đừng bỏ qua); (b) **outcome state** — kết quả mỗi hành động ở bước 5 (xác nhận post-submit, validation-failed, dismissed, màn đã biến hình sau một CTA). Mọi state user thật chạm tới phải liệt ở đây — `/usecase-factory:design-a-screen` vẽ từng cái và `/usecase-factory:brief-to-html` render mỗi cái thành một mục riêng, nên thiếu một state ở đây = thiếu khắp downstream.
 7. **Palette-gap (nếu có ràng buộc palette).** Nếu dự án giới hạn UI trong một bộ component/view-type cố định, gắn cờ mọi element màn này cần mà palette thiếu. Gọi tên việc bespoke sớm = giá trị cao.
 
 Capture từng màn vào `screens-brief.md` **ngay khi nó được chốt** — đừng dồn tới cuối.
@@ -95,6 +97,8 @@ Lấy doc **MVP & Core Loop** (input #4) làm xương sống và ưu tiên MR l�
 
 **Nav shape (nhẹ):** một đoạn — các màn v0 nhóm thế nào, user di chuyển giữa chúng ra sao (top tab / left rail / wizard / master-detail)? Giữ nhẹ; `/usecase-factory:design-a-screen` mới đào sâu layout nav.
 
+**Nav & headings spec (cho external generator):** sau khi đã có nav shape + copy pass (bước 7), gom vào mục `## Nav & headings spec` một khối paste-được: top nav (shape + danh sách items đúng thứ tự) và bảng `màn → page title → section headings`. Đây là cái đưa cho tool vẽ ngoài (pencil…) **kèm design system, KHÔNG kèm ASCII** — cho máy *ý định nav + nhãn* thay vì *tranh ASCII* để tránh anchoring xấu.
+
 **Flows (bắt buộc, KHÔNG nhẹ):** vẽ các business flow đầu-cuối dưới dạng chuỗi state-transition, lắp từ các action-outcome bắt ở bước 2. Một dòng / một flow, vd:
 - *Onboarding:* `S1.b1 → b2 → b3 (đề xuất) → b4 (xác nhận) → Lưu → S2.first-run`
 - *Drift → re-plan:* `notification → S3.review → (Duyệt) → S3.done → S2.home (đã cập nhật)`
@@ -108,7 +112,7 @@ Viết `doc/ws-<slug>/screens-brief.md` theo contract dưới (template: [`templ
 
 ### 7. Copy pass (chạy `/usecase-factory:copy-writer`)
 
-Sau khi bộ màn đã chốt, làm một **pass microcopy** trên đó với `/usecase-factory:copy-writer` — text trên-sản-phẩm mỗi màn cần, để `/usecase-factory:design-a-screen` và `/usecase-factory:mockup-to-html` khỏi bịa label vứt-đi. Copy chấm qua CÙNG lăng kính target-user (§ Target user lens) — register, expertise, ngưỡng jargon đều lấy từ doc persona.
+Sau khi bộ màn đã chốt, làm một **pass microcopy** trên đó với `/usecase-factory:copy-writer` — text trên-sản-phẩm mỗi màn cần, để `/usecase-factory:design-a-screen` và `/usecase-factory:brief-to-html` khỏi bịa label vứt-đi. Copy chấm qua CÙNG lăng kính target-user (§ Target user lens) — register, expertise, ngưỡng jargon đều lấy từ doc persona.
 
 Mỗi màn, `/usecase-factory:copy-writer` sinh ra và bạn ghi vào block **Copy** của màn (contract dưới):
 
@@ -130,8 +134,14 @@ Bước này là một LỚP copy phủ lên spec, không phải vẽ lại — 
 # Screen Brief — ws-<slug>
 
 > Phase: bridge (research → wireframe). Source: <context doc> · <MR doc> · <target-user doc> · <MVP-coreloop doc> [· brief.md]
-> Feeds: /usecase-factory:design-a-screen (ASCII) → /usecase-factory:mockup-to-html (HTML) → prototype.
+> Feeds: /usecase-factory:design-a-screen (ASCII) → /usecase-factory:brief-to-html (HTML) → prototype.
 > This is a SPEC (justified screen set), NOT ASCII. No code, no layout.
+
+## Design system (REQUIRED — skin source for every render; ASK which files, don't assume layout)
+- Location: <folder / URL — default repo design-system/, or user-named / $DESIGN_SYSTEM_ROOT>
+- Tokens file: <exact file the user confirmed — e.g. design-system/Openclaw_Design_System.html>
+- Components file: <exact file the user confirmed — may be the same as tokens file>
+- Buildable palette: <component set — the constraint design-a-screen scores palette-gaps against>
 
 ## Target user lens (one line)
 <who the screens are judged from — role, expertise, device, frequency, error-tolerance>
@@ -180,6 +190,11 @@ Bước này là một LỚP copy phủ lên spec, không phải vẽ lại — 
 
 ## Navigation shape (light)
 <one paragraph + grouping list — /usecase-factory:design-a-screen explores this deeper>
+
+## Nav & headings spec (for external generator — pencil…)
+<copy-paste block to hand an external generator WITH the design system, NOT with ASCII. Intent-level, not pixels.>
+- Top nav: <shape> — items: <Label 1 · Label 2 · …> (order; first = active)
+- Per-screen headings (table): | Screen | Page title | Section headings (h2) |
 
 ## Open questions for /usecase-factory:design-a-screen
 - <layout/IA/state question to resolve while drawing>

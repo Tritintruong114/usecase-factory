@@ -10,8 +10,20 @@ File đặt tại doc/ws-<slug>/screens-brief.md
 -->
 
 > **Phase: bridge (research → wireframe).** Nguồn: Boi-Canh · MR · Target-User · MVP-Coreloop (· brief.md).
-> **Feed:** `/usecase-factory:design-a-screen` (ASCII) → `/usecase-factory:mockup-to-html` (HTML) → prototype.
+> **Feed:** `/usecase-factory:design-a-screen` (ASCII) → `/usecase-factory:brief-to-html` (HTML) → prototype.
 > Đây là **SPEC tập màn đã biện minh**, KHÔNG phải ASCII/layout/code. Mỗi màn phải trace về một việc user cần làm.
+
+## Design system (BẮT BUỘC — nguồn skin cho mọi render)
+
+> Pipeline **luôn luôn** cần một design system. Đây là tầng *skin* (màu/bo góc/type/component shape) mà ASCII không diễn đạt nổi. Không có DS → **DỪNG**, hỏi user trỏ tới một bộ. KHÔNG fallback "neutral default" âm thầm.
+> **Cấu trúc bộ DS KHÔNG cố định** — có thể là 1 file HTML đóng gói (vd `design-system/Openclaw_Design_System.html`), một folder CSS+JSX, hay export Figma. Nên **PHẢI HỎI user file nào trong bộ dùng cho tokens, file nào cho component** — đừng đoán `src/index.css`/`ui.jsx`. Ghi đúng path đã chốt vào đây để downstream đọc thẳng, khỏi hỏi lại.
+
+> **Bộ DS thường nằm NGOÀI repo** (mỗi team một bộ riêng); `design-system/` trong repo chỉ là DEMO. Trỏ bằng absolute path/URL của team.
+
+- **Vị trí bộ:** <absolute path/URL bộ của team — hoặc `$DESIGN_SYSTEM_ROOT`, hoặc bộ demo `design-system/`>
+- **File tokens:** <đúng file user đã chốt — vd `tokens.css` đã extract, hoặc `<...>/Openclaw_Design_System.html`>
+- **File components:** <đúng file user đã chốt — có thể trùng file tokens>
+- **Palette buildable:** <component set khả dụng — ràng buộc cho `/usecase-factory:design-a-screen` chấm palette-gap>
 
 ## Góc nhìn target user (lăng kính chấm mọi màn)
 
@@ -70,6 +82,17 @@ File đặt tại doc/ws-<slug>/screens-brief.md
 ## Navigation shape (nhẹ)
 
 <Một đoạn: v0 màn group thế nào, user di chuyển ra sao (top tabs / left rail / wizard / master-detail).>
+
+## Nav & headings spec (cho external generator — pencil…)
+
+> Khối gom-1-chỗ để paste cho tool vẽ ngoài (pencil…) **KÈM design system, KHÔNG kèm ASCII**. Mức intent (WHAT), không pixel — DS lo HOW. Đây là cách tránh anchoring xấu khi đưa cho máy vẽ: cho nó *ý định nav + nhãn*, không cho nó *tranh ASCII* để tái tạo.
+
+- **Top nav:** <shape: top tabs / left rail / wizard / master-detail> — items: <Nhãn 1 · Nhãn 2 · …> (đúng thứ tự; mục đầu = active)
+- **Per-screen headings:**
+
+| Màn | Page title | Section headings (h2) |
+| --- | --- | --- |
+| S1 | <title> | <h2 a · h2 b> |
 
 ## Open questions cho `/usecase-factory:design-a-screen`
 

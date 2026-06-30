@@ -33,7 +33,7 @@ When the full pipeline runs through to rendering, the deliverable is a self-expl
 | `_research/dossier.md` + the 4 research docs | evidence + the Decision Gate verdict | "why it's worth building" |
 | `HANDOFF.md` | the index that ties it together: verdict, read-order, scope boundaries, next step per receiver | read FIRST |
 
-> ⚠ **`mockups.html` and `mockups.data.js` travel together.** The `.html` loads the data via `<script src="mockups.data.js">` (relative path), so both must stay in the same folder — emailing/zipping/uploading the `.html` alone renders blank. "Self-contained" means self-contained **as a pair**. `HANDOFF.md` (emitted by `mockup-to-html` as the terminal step) makes the whole folder pick-up-able without questions.
+> ⚠ **`mockups.html` and `mockups.data.js` travel together.** The `.html` loads the data via `<script src="mockups.data.js">` (relative path), so both must stay in the same folder — emailing/zipping/uploading the `.html` alone renders blank. "Self-contained" means self-contained **as a pair**. `HANDOFF.md` (emitted by `brief-to-html` as the terminal step) makes the whole folder pick-up-able without questions.
 
 ## What's inside the plugin
 
@@ -62,7 +62,7 @@ usecase-factory/
       SKILL.md
     design-a-screen/           # screens-brief.md → ASCII wireframes
       SKILL.md
-    mockup-to-html/            # ASCII wireframe → static HTML viewer + handoff index
+    brief-to-html/             # screen brief + design system → static HTML viewer + handoff index
       SKILL.md
       assets/                  # template.html + example.data.js + HANDOFF.template.md
     use-case-brief/            # OPTIONAL upstream — rough idea → validated brief.md seed
@@ -76,6 +76,9 @@ usecase-factory/
   scripts/
     validate-dossier.sh        # checks the dossier heading contract
     coverage-check.sh          # checks the 4 output docs exist + are placeholder-free
+    extract-design-tokens.sh   # bundled-HTML design system → paste-ready tokens.css
+  design-system/               # bundled DEMO design system (NOT shipped; teams point at their own)
+    Openclaw_Design_System.html
 ```
 
 ## Install from the marketplace
@@ -121,6 +124,15 @@ bash scripts/coverage-check.sh   doc/ws-<slug> <slug>
 - `validate-dossier.sh` — confirms the dossier carries sections 0–9, an Evidence Table, and a Decision Gate verdict.
 - `coverage-check.sh` — confirms the four output docs exist and have no leftover placeholders (`<placeholder>`, `TODO`, guidance comments, etc.).
 
+## Design system
+
+The HTML render (`brief-to-html`) is always skinned by a **design system** — that's what makes the prototype look real instead of like raw ASCII boxes. The model:
+
+- **Design systems live *outside* this repo.** Each team points at their own (a path, URL, or Figma/Storybook export). The repo ships one **bundled demo** under `design-system/` so the pipeline runs out of the box.
+- **Pick one per run.** `grill-to-brief` records the chosen system in the brief's `## Design system` section — the exact file(s) for tokens and components. Resolution order: the path you name → `$DESIGN_SYSTEM_ROOT` → the bundled demo. If none resolves, the render skills **stop and ask** (there's no skin-less fallback — that's exactly what makes HTML render ugly).
+- **Bundled HTML? Extract tokens first.** If the design system is a self-contained HTML export, run `npm run extract:tokens path/to/design-system.html` to produce a clean `tokens.css` (light + dark) next to it. `brief-to-html` inlines those tokens into `mockups.html`, so the prototype stays self-contained.
+- **The generated `tokens.css` is not committed** — it's reproducible from the source, so it's gitignored like other build output.
+
 ## How research and evidence work
 
 A few rules are load-bearing — they are what make the output trustworthy:
@@ -134,10 +146,9 @@ A few rules are load-bearing — they are what make the output trustworthy:
 
 ## Development status
 
-- **v0.1.0** — local plugin MVP.
-- **6 skills** — the pipeline `[use-case-brief] → run → grill-to-brief → design-a-screen → mockup-to-html`, plus `copy-writer` (microcopy, invoked by grill-to-brief) — + **5 agents** (4 research workers + 1 adversarial decision-gate reviewer). `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). The pipeline terminates at the self-contained handoff package; the live interactive prototype (which needs a dev environment) is intentionally left to the dev repo.
+- **v0.2.0** — local plugin MVP.
+- **6 skills** — the pipeline `[use-case-brief] → run → grill-to-brief → design-a-screen → brief-to-html`, plus `copy-writer` (microcopy, invoked by grill-to-brief), + **5 agents** (4 research workers + 1 adversarial decision-gate reviewer). `design-a-screen` (ASCII) and `brief-to-html` (HTML) both branch off the screen brief: the ASCII is the human-alignment artifact + coverage gate, while `brief-to-html` renders from the brief + [design system](#design-system) and only cross-checks coverage against the ASCII. `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). The pipeline terminates at the self-contained handoff package; the live interactive prototype (which needs a dev environment) is intentionally left to the dev repo.
 - Tested locally with `claude --plugin-dir .` (skills + all 5 agents discovered via `claude plugin details`).
-- **`mockup-to-html` reads a style reference** for its tokens — resolved in order: a reference you name → `$DESIGN_SYSTEM_ROOT` → the repo default `new-design/` → neutral default tokens if none exists. The tokens are inlined into `mockups.html`, so the output stays self-contained regardless. Every skill runs from `doc/ws-<slug>/` (plus, for `mockup-to-html`, the optional style reference).
 - **npm-ready but not published** — no package will be pushed unless the maintainer explicitly confirms.
 
 ## Publishing

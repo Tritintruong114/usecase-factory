@@ -7,8 +7,8 @@ window.WIREFRAME = {
   meta: {
     title: "Tên use-case",
     subtitle: "ws-<name> · wireframe",
-    source: "doc/ws-<name>/mockups.md",
-    styleRef: "new-design/",
+    source: "doc/ws-<name>/screens-brief.md",
+    styleRef: "design-system/Openclaw_Design_System.html",
     avatar: "🏪",
     runSwitch: true,          // drop (or false) if no live/rest concept
     restLabel: "⏸ Nghỉ", runLabel: "▶ Trực", goLiveLabel: "Lên sóng ▸",

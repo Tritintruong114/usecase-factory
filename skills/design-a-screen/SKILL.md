@@ -21,7 +21,7 @@ Before sketching, understand:
 - [ ] How many screens / sections, and how do users move between them?
 - [ ] What states must each screen handle? (empty / loading / error / first-run vs returning / done)
 - [ ] Any hard constraints? Embedded (iframe) vs standalone, brand, accessibility, i18n/RTL.
-- [ ] **Palette constraint** — does the project restrict UI to a fixed component/widget set (a design system, a declarative-UI palette, etc.)? If yes, read that source, constrain every mockup to buildable widgets, and **flag any element that needs something the palette lacks** (a "palette-gap"). This is often the highest-value output — it surfaces bespoke-component work early. Skip if the project has no such constraint.
+- [ ] **Design system (REQUIRED)** — this pipeline always runs against a design system. Read the **exact file(s)** recorded in the screen brief's `## Design system` section. If they're missing (running standalone), resolve the location — design systems normally live OUTSIDE this repo (a path/URL the user names → `$DESIGN_SYSTEM_ROOT` → the repo's bundled demo `design-system/`) — then **list its files and ASK the user which file(s) to use for tokens and components** — the layout is NOT fixed (it may be a single bundled HTML like `design-system/Openclaw_Design_System.html`), so never assume `src/index.css`/`ui.jsx`. Constrain every mockup to its buildable widgets and **flag any element the palette lacks** (a "palette-gap") — often the highest-value output, surfacing bespoke-component work early. **If no design system resolves, STOP and ask the user to point at one** before sketching — never silently fall back to an unconstrained palette.
 
 Ask the gaps out loud; explore the codebase/docs for answers before asking the user.
 
@@ -94,7 +94,7 @@ Write the outcome to `doc/ws-<name>/mockups.md` (or the nearest planning folder 
 - Palette-gaps found → bespoke components that need building (feed these to planning/grill).
 - One line per rejected layout: what it was and why it lost (so the choice is auditable later).
 
-Persist as decisions crystallise — don't batch to the end. This file (`mockups.md`) feeds `/usecase-factory:mockup-to-html` next, and is the coverage GATE a later PRD/FE step reads.
+Persist as decisions crystallise — don't batch to the end. This file (`mockups.md`) is the human-alignment artifact and the coverage GATE a later PRD/FE step reads; `/usecase-factory:brief-to-html` renders the prototype from the screen brief and only cross-checks coverage against this ASCII map (it does NOT render from the ASCII — that would anchor the output to a crude grid).
 
 ## Anti-patterns
 

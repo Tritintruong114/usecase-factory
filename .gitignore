@@ -16,3 +16,9 @@ npm-debug.log*
 doc/
 output/
 logs/
+
+# Generated design-system token extracts (regenerate via `npm run extract:tokens`).
+# Design systems themselves live OUTSIDE this repo — only the bundled demo under
+# design-system/ is committed; teams point at their own via the brief / $DESIGN_SYSTEM_ROOT.
+design-system/**/tokens.css
+design-system/tokens.css

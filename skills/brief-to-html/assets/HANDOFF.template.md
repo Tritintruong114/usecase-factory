@@ -1,6 +1,6 @@
 # Handoff — ws-<slug> ("<Tên hiển thị>")
 
-> Gói handoff tự-giải-thích cho use-case này. Đọc file này TRƯỚC. Sinh bởi `/usecase-factory:mockup-to-html` ở cuối pipeline.
+> Gói handoff tự-giải-thích cho use-case này. Đọc file này TRƯỚC. Sinh bởi `/usecase-factory:brief-to-html` ở cuối pipeline.
 
 **Verdict:** <Proceed | Pivot | Narrow | Kill> · **Confidence:** <cao/vừa/thấp> · **Top risk:** <vd WTP chưa verify>
 **Xem trước:** mở `mockups.html` (double-click) — **phải nằm cùng thư mục với `mockups.data.js`**.
@@ -28,6 +28,6 @@
 - **Prototype tương tác:** upload `mockups.data.js` + `screens-brief.md` vào web-app prototype.
 - **Dev build FE (Phase-2):** dựng FE từ `mockups.md` (GATE) + `mockups.data.js` (states) + `screens-brief.md` (ý đồ).
 
-## Style reference đã dùng
+## Design system đã dùng (bắt buộc)
 
-<new-design/ | $DESIGN_SYSTEM_ROOT | neutral default — ghi rõ tokens lấy từ đâu, để bước sau tái lập đúng skin>
+<brief §Design system | design-system/ | $DESIGN_SYSTEM_ROOT — ghi rõ ĐÚNG file tokens/components đã dùng (vd `design-system/Openclaw_Design_System.html`), để bước sau tái lập đúng skin. KHÔNG có "neutral default": pipeline luôn render trên một design system.>

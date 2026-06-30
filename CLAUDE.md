@@ -16,10 +16,13 @@ and a couple of bash validators. README.md is the user-facing doc; this file is 
 ## The pipeline (skills are stages, in order)
 
 ```
-[use-case-brief]  →  run  →  grill-to-brief  →  design-a-screen  →  mockup-to-html
-  (optional seed)    (research +    (research →      (brief →           (ASCII →
-                      Decision Gate)  screen brief)    ASCII wireframe)   self-contained HTML
-                                                                          + HANDOFF.md)
+[use-case-brief] → run → grill-to-brief → design-a-screen ─┐
+  (optional seed)  (research+  (research→    (brief→ASCII    │ (ASCII = human-align
+                  Decision    screen brief)  wireframe,      │  + COVERAGE GATE)
+                  Gate)                      coverage gate)  │
+                                                            └→ brief-to-html
+                                              (brief + design system → self-contained HTML;
+                                               ASCII only cross-checks coverage) + HANDOFF.md
 ```
 `copy-writer` is a sub-skill invoked by `grill-to-brief` (microcopy), not a standalone stage.
 The pipeline **stops at the handoff package** — it deliberately does NOT produce real backend
@@ -104,7 +107,10 @@ and `scripts/coverage-check.sh` to match — otherwise valid output will fail va
   unless the maintainer explicitly confirms.
 
 ## In-flight note
-README documents 6 skills. Some skill folders are still untracked/in progress (e.g. a rename
-toward a `to-prototype`-style stage may be underway). Confirm the current skill set with
-`ls skills/` before assuming a stage's name — don't trust README's tree if `git status` shows
-new untracked skill dirs.
+The 6 skills are `use-case-brief · run · grill-to-brief · copy-writer · design-a-screen ·
+brief-to-html`. The HTML render stage was renamed `mockup-to-html` → **`brief-to-html`** in
+0.2.0 when its primary input flipped from the ASCII map to the screen brief (the ASCII anchored
+the render to an ugly grid; the brief + design system produce a far better look). The ASCII
+(`design-a-screen` → `mockups.md`) is now the human-alignment artifact + coverage gate, not the
+render source. Always confirm the current skill set with `ls skills/` before assuming a stage's
+name.
