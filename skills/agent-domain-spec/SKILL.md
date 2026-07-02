@@ -24,7 +24,8 @@ Mô hình tư duy: **Business process** (research tả) → **Agent Domain Spec*
 Trước khi làm bất cứ gì, **đọc `playbook.md`** trong thư mục skill này (`${CLAUDE_PLUGIN_ROOT}/skills/agent-domain-spec/playbook.md`) từ đầu tới cuối. Đây là **GUIDE THỰC THI CHÍNH THỨC**: 7-step flow, spec của `domain-modeler-agent` + `agent-logic-reviewer`, 20-section contract của `Agent-Domain-Spec.md`, các luật load-bearing (anti-over-automation, mọi action phân loại auto/duyệt/cấm, mọi phần map sang OpenClaw primitive), và boundaries. Router chỉ gọi tên các bước; playbook định nghĩa cách làm.
 
 Template điền vào `Agent-Domain-Spec.md` nằm tại `${CLAUDE_PLUGIN_ROOT}/skills/agent-domain-spec/templates/06-agent-domain-spec.template.md`.
-Validator: `${CLAUDE_PLUGIN_ROOT}/scripts/validate-agent-domain-spec.sh`.
+Template điền vào `01-PRODUCT-MAP.md` (Decision Pack — bản đồ quyết định sản phẩm 1 trang) nằm tại `${CLAUDE_PLUGIN_ROOT}/skills/agent-domain-spec/templates/07-product-map.template.md`.
+Validator: `${CLAUDE_PLUGIN_ROOT}/scripts/validate-agent-domain-spec.sh` (cũng kiểm tra `01-PRODUCT-MAP.md` tồn tại cạnh spec).
 
 ## Command contract (tóm tắt — chi tiết ở playbook)
 
@@ -32,14 +33,16 @@ Validator: `${CLAUDE_PLUGIN_ROOT}/scripts/validate-agent-domain-spec.sh`.
 /usecase-factory:agent-domain-spec <slug>
 ```
 
-- Đọc `_research/dossier.md` + 4 doc research + `MVP-Coreloop.md` (+ `brief.md`) từ `doc/ws-<slug>/` TRƯỚC. Thiếu dossier hoặc MVP core loop → nói rõ thiếu cái nào và DỪNG (không thể agent-hóa khi chưa có nghiệp vụ + vòng lặp).
+- Đọc `appendix/dossier.md` + 4 doc research trong `appendix/` + `appendix/MVP-Coreloop.md` (+ `brief.md`) từ `doc/ws-<slug>/` TRƯỚC. Thiếu dossier hoặc MVP core loop → nói rõ thiếu cái nào và DỪNG (không thể agent-hóa khi chưa có nghiệp vụ + vòng lặp).
 - Chỉ chạy tiếp khi **Decision Gate = Proceed**. Verdict khác → trình lại quyết định, không tự vượt.
 - Derive từng section; các **gate rủi ro** (role split / autonomy line · approval policy auto-vs-duyệt-vs-cấm · guardrails · confidence fallback) KHÔNG bao giờ tự điền âm thầm — recommend rồi chờ confirm.
-- Ghi `doc/ws-<slug>/Agent-Domain-Spec.md` tăng dần (đừng dồn). Chạy validator trước khi xong.
+- Ghi `doc/ws-<slug>/Agent-Domain-Spec.md` tăng dần (đừng dồn). Sau đó tổng hợp `doc/ws-<slug>/01-PRODUCT-MAP.md` (Decision Pack — bản đồ quyết định sản phẩm) và cập nhật routing trong `00-START-HERE.md`. Chạy validator trước khi xong.
 
 ## Outputs (bắt buộc)
 
 - `doc/ws-<slug>/Agent-Domain-Spec.md` — đủ 20 section (§0–§19), validator pass.
+- `doc/ws-<slug>/01-PRODUCT-MAP.md` — Decision Pack: pain → user → workflow → agent job → giá trị → moat, core loop + agent actions + approval + guardrails + metrics, và danh sách KHÔNG build ở V0.
+- `doc/ws-<slug>/00-START-HERE.md` — cập nhật (không tạo mới): routing trỏ tới `Agent-Domain-Spec.md` + `01-PRODUCT-MAP.md`, tick trạng thái pipeline.
 
 ```
 bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-agent-domain-spec.sh doc/ws-<slug>/Agent-Domain-Spec.md

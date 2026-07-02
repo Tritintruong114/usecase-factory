@@ -10,7 +10,7 @@
       "name": "usecase-factory",
       "source": "./",
       "description": "Research an AI Agent product idea into a dossier + four research docs and a Proceed/Pivot/Narrow/Kill decision.",
-      "version": "0.3.0",
+      "version": "1.0.0",
       "author": { "name": "ClawExperts", "email": "tintt@firegroup.io" },
       "license": "MIT",
       "homepage": "https://github.com/Tritintruong114/usecase-factory",

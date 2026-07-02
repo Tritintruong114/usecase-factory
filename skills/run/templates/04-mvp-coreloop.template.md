@@ -11,7 +11,7 @@ status: draft
 INPUT #4 của /usecase-factory:grill-to-brief — "MVP & Core Loop".
 Mục đích: khoá SCOPE v0 + VÒNG LẶP GIÁ TRỊ. Là spine để grill vẽ cut line + biết màn nào gánh "pull" của loop.
 NẾU đã có brief.md: core loop + cut line LẤY TỪ ĐÓ, doc này chỉ nở ra — không tự chế lại.
-File đặt tại doc/ws-<slug>/MVP-Coreloop.md
+File đặt tại doc/ws-<slug>/appendix/MVP-Coreloop.md
 -->
 
 # MVP & Core Loop — <Tên use-case>

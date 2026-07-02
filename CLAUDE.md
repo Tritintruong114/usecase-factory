@@ -17,21 +17,30 @@ and a couple of bash validators. README.md is the user-facing doc; this file is 
 
 ```
 [use-case-brief] → run → agent-domain-spec → grill-to-brief → design-a-screen ─┐
-  (optional seed)  (research+  (research+core    (spec→         (brief→ASCII    │ (ASCII = human-align
-                  Decision    loop → Agent       screen brief,  wireframe,      │  + COVERAGE GATE)
-                  Gate)       Domain Spec on     a projection   coverage gate)  │
+  (optional seed)  (research+  (research+core    (spec→         (brief→ASCII    │ (ASCII = coverage
+                  Decision    loop → Agent       screen brief,  wireframe,      │  gate, filed in
+                  Gate)       Domain Spec on     a projection   appendix/)      │  appendix/)
                               OpenClaw)          of the spec)                   │
                                                                                └→ brief-to-html
                                                  (brief + design system → self-contained HTML;
-                                                  ASCII only cross-checks coverage) + HANDOFF.md
+                                                  ASCII only cross-checks coverage;
+                                                  finalizes 00-START-HERE.md)
 ```
+Every stage keeps a single **Decision Pack** current in `doc/ws-<slug>/`: `00-START-HERE.md`
+(verdict + summary + role-based routing, written by `run`, updated by every later stage) and
+`01-PRODUCT-MAP.md` (the product decision — pain → user → workflow → agent job → business value →
+moat — written by `agent-domain-spec`) sit at the workspace root next to the builder specs
+(`Agent-Domain-Spec.md`, `screens-brief.md`, `mockups.{html,data.js}`). The dossier, the 4 research
+docs, and the ASCII map are evidence, not decisions — they live in `appendix/`, out of the way.
+There is no separate `HANDOFF.md` — `00-START-HERE.md` has carried that job since 1.0.0.
+
 `agent-domain-spec` sits between `run` and `grill-to-brief`: for an Agent App you do NOT jump from a
 core loop straight to a screen brief. It writes `Agent-Domain-Spec.md` — how the nghiệp-vụ is
 agent-ised (objects, lifecycle, intents, signals, decision/approval policy, guardrails, learning
 loop, background jobs) mapped onto **OpenClaw primitives** (skills · tools/connectors · memory ·
 sessions/subagents · cron/heartbeat · approval surfaces · guardrails · workspace state). The screen
 brief is then a *projection* of that spec. `copy-writer` is a sub-skill invoked by `grill-to-brief`
-(microcopy), not a standalone stage. The pipeline **stops at the handoff package** — it deliberately
+(microcopy), not a standalone stage. The pipeline **stops at the Decision Pack** — it deliberately
 does NOT produce real backend code, an FE↔BE contract, or the real OpenClaw build. That's Phase-2,
 a separate repo.
 
@@ -61,11 +70,24 @@ relative or absolute local paths:
 All skills operate from the per-run working dir `doc/ws-<slug>/`.
 
 ## Templates
-Numbered, copied (not generated from scratch) by the owning skill, then filled:
-`00`–`04` live in `skills/run/templates/` (dossier + 4 research docs); `05-screens-brief` in
-`skills/grill-to-brief/templates/`; `06-agent-domain-spec` in `skills/agent-domain-spec/templates/`
-(headings §0–§19 are a contract — see `validate-agent-domain-spec.sh`). If you change a template's
-headings, **update the matching validator** — heading names are a contract (see below).
+Numbered, copied (not generated from scratch) by the owning skill, then filled. The number is a
+global add-order sequence across the whole plugin, not per-directory — always check the highest
+number in use across `skills/*/templates/` before adding one, so two skills never claim the same
+number in different folders.
+
+- `00`–`04` live in `skills/run/templates/` — dossier + 4 research docs, written into
+  `doc/ws-<slug>/appendix/`.
+- `05-screens-brief` lives in `skills/grill-to-brief/templates/` → `screens-brief.md`.
+- `06-agent-domain-spec` lives in `skills/agent-domain-spec/templates/` → `Agent-Domain-Spec.md`
+  (headings §0–§19 are a contract — see `validate-agent-domain-spec.sh`).
+- `07-product-map` lives in `skills/agent-domain-spec/templates/` → `01-PRODUCT-MAP.md`, the
+  product decision map (Decision Pack).
+- `08-start-here` lives in `skills/run/templates/` → `00-START-HERE.md`, the Decision Pack entry
+  point — written by `run`, then updated (not re-created) by `agent-domain-spec`, `grill-to-brief`,
+  and `brief-to-html` as each stage's artifacts become available.
+
+If you change a template's headings, **update the matching validator** — heading names are a
+contract (see below).
 
 ## Load-bearing rules (don't soften these when editing playbooks)
 
@@ -75,7 +97,7 @@ These are what make the output trustworthy. They're enforced in prose AND in `va
   real web search + fetched, cited URLs. Not from memory, not from a vault.
 - **`brief.md` / any local note is a SEED, never a source** — it says what's already decided
   (core loop, scope); it supplies no market numbers.
-- **The dossier (`_research/dossier.md`) is the single source of truth** — the 4 output docs may
+- **The dossier (`appendix/dossier.md`) is the single source of truth** — the 4 output docs may
   only state claims that have a row + source/label in the dossier. Headings 0–9 are a CONTRACT.
 - **Layer every claim: must-cite / infer / assumption** — must-cite needs a URL (verify ≥2
   sources for important figures); assumptions (WTP, urgency, switching, integration, ROI) are
@@ -104,9 +126,9 @@ claude --plugin-dir .
 claude plugin details usecase-factory
 
 # Validators (the skills run these automatically; run them by hand when editing contracts):
-bash scripts/validate-dossier.sh           doc/ws-<slug>/_research/dossier.md  # heading + verdict + layering contract
-bash scripts/coverage-check.sh             doc/ws-<slug> <slug>                # 4 docs exist + placeholder-free
-bash scripts/validate-agent-domain-spec.sh doc/ws-<slug>/Agent-Domain-Spec.md  # §0–§19 + approval layering + OpenClaw map
+bash scripts/validate-dossier.sh           doc/ws-<slug>/appendix/dossier.md   # heading + verdict + layering contract
+bash scripts/coverage-check.sh             doc/ws-<slug> <slug>                # 00-START-HERE.md exists + 4 appendix docs placeholder-free
+bash scripts/validate-agent-domain-spec.sh doc/ws-<slug>/Agent-Domain-Spec.md  # §0–§19 + approval layering + OpenClaw map + 01-PRODUCT-MAP.md sibling
 # or: npm run validate:dossier / npm run validate:coverage / npm run validate:agent-domain-spec
 ```
 
@@ -129,6 +151,14 @@ rather than a leap from core loop to UI. The HTML render stage was renamed `mock
 **`brief-to-html`** in
 0.2.0 when its primary input flipped from the ASCII map to the screen brief (the ASCII anchored
 the render to an ugly grid; the brief + design system produce a far better look). The ASCII
-(`design-a-screen` → `mockups.md`) is now the human-alignment artifact + coverage gate, not the
-render source. Always confirm the current skill set with `ls skills/` before assuming a stage's
-name.
+(`design-a-screen` → `appendix/mockups.md`) is a coverage-gate artifact, not the render source.
+
+**1.0.0** restructured the *output shape* into a Decision Pack (breaking change to output paths —
+see `CONTRIBUTING.md`'s versioning table): `run` now also writes `00-START-HERE.md` (verdict +
+summary + role-based routing, kept current by every later stage) and files the dossier + 4 research
+docs under `appendix/` instead of the workspace root / `_research/`; `agent-domain-spec` also
+writes `01-PRODUCT-MAP.md` (the one-page product decision); `design-a-screen`'s `mockups.md` moved
+into `appendix/`; and the old terminal-only `HANDOFF.md` was retired — `brief-to-html`'s last step
+now finalizes `00-START-HERE.md` instead of emitting a separate file. Always confirm the current
+skill set with `ls skills/` and the current output shape with `ls skills/*/templates/` before
+assuming a stage's name or a file's path.

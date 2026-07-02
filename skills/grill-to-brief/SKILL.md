@@ -31,9 +31,10 @@ Template để điền vào `screens-brief.md` nằm tại `${CLAUDE_PLUGIN_ROOT
 /usecase-factory:grill-to-brief <slug>
 ```
 
-- Đọc `Agent-Domain-Spec.md` (input chính, nếu có) + cả 4 doc research từ `doc/ws-<slug>/` (+ `brief.md` nếu có) TRƯỚC. Thiếu một loại doc research → nói rõ thiếu cái nào và dừng. Thiếu `Agent-Domain-Spec.md` → cảnh báo mạnh + đề xuất chạy `/usecase-factory:agent-domain-spec` trước, fallback 4 doc nếu user xác nhận.
+- Đọc `Agent-Domain-Spec.md` (input chính, nếu có) + cả 4 doc research trong `doc/ws-<slug>/appendix/` (+ `brief.md` nếu có) TRƯỚC. Thiếu một loại doc research → nói rõ thiếu cái nào và dừng. Thiếu `Agent-Domain-Spec.md` → cảnh báo mạnh + đề xuất chạy `/usecase-factory:agent-domain-spec` trước, fallback 4 doc nếu user xác nhận.
 - Grill **từng màn một**, recommend-rồi-chờ. Gate decision (screen-set, screen-hay-không, lỗ hổng coverage, cut line) không bao giờ tự điền âm thầm — nêu + confirm từng cái.
 - Viết `doc/ws-<slug>/screens-brief.md` tăng dần (đừng dồn).
+- Xong bộ màn → cập nhật `doc/ws-<slug>/00-START-HERE.md` (routing + trạng thái pipeline), không tạo file mới.
 
 ## Boundaries (tóm tắt — chi tiết ở playbook)
 

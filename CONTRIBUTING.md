@@ -57,7 +57,7 @@ claude --plugin-dir .                       # plugin loads
 claude plugin details usecase-factory       # your skill/agent is discovered
 
 # If you touched the dossier/doc contracts, run the validators on a sample run:
-bash scripts/validate-dossier.sh doc/ws-<slug>/_research/dossier.md
+bash scripts/validate-dossier.sh doc/ws-<slug>/appendix/dossier.md
 bash scripts/coverage-check.sh   doc/ws-<slug> <slug>
 ```
 

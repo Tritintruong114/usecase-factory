@@ -9,6 +9,43 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to choose a version bump.
 ## [Unreleased]
 
 ### Added
+- **Decision Pack output shape.** `run` now also writes `doc/ws-<slug>/00-START-HERE.md` (template
+  `08-start-here`) as soon as a verdict exists — a 5–10 line summary, the verdict + why, and
+  role-based routing (product / builder / evidence). Every later stage (`agent-domain-spec`,
+  `grill-to-brief`, `brief-to-html`) UPDATES this same file as its artifacts land, so it stays
+  accurate at whatever gate a run stops.
+- **`01-PRODUCT-MAP.md`** (template `07-product-map`, written by `agent-domain-spec`) — a one-page
+  product decision: pain → user → workflow → agent job → business value → moat, the core loop +
+  agent actions + human approval points + guardrails + success metrics, and an explicit "not in v0"
+  list to block scope creep. This is a projection of `Agent-Domain-Spec.md` + the research, not a
+  research summary — every claim traces to a section in `appendix/` or the spec.
+- `scripts/coverage-check.sh` now also checks `00-START-HERE.md` exists.
+- `scripts/validate-agent-domain-spec.sh` now also checks that `01-PRODUCT-MAP.md` exists next to
+  the spec and is placeholder-free.
+
+### Changed
+- **Evidence moved into `appendix/`.** The dossier (was `_research/dossier.md`, now
+  `appendix/dossier.md`) and the 4 research docs (`Boi-Canh-Va-Van-De.md`,
+  `MR-<slug>-Problem-Solution.md`, `Target-User-<slug>.md`, `MVP-Coreloop.md`) moved from the
+  workspace root into `appendix/`. `design-a-screen`'s ASCII wireframe (`mockups.md`) also moved
+  into `appendix/`. `Agent-Domain-Spec.md`, `screens-brief.md`, and `mockups.{html,data.js}` stay
+  at the workspace root — they're decisions/deliverables, not evidence.
+- **`HANDOFF.md` is retired.** Its job (verdict, read-order, scope boundaries, next step per
+  receiver) is now carried by `00-START-HERE.md` from the very first stage instead of appearing
+  only once `brief-to-html` finishes. `brief-to-html`'s former Step 5 ("emit the handoff index")
+  is now "finalize `00-START-HERE.md`" — it updates the existing file instead of creating a new
+  one. `skills/brief-to-html/assets/HANDOFF.template.md` was deleted; its content is folded into
+  the new `08-start-here.template.md`.
+- **BREAKING: output file paths changed.** Any tooling/scripts that read
+  `doc/ws-<slug>/_research/dossier.md`, the 4 research docs from the workspace root, or
+  `doc/ws-<slug>/HANDOFF.md` must be updated — see the `appendix/` layout above. Per
+  `CONTRIBUTING.md`'s versioning table, renaming/moving output files is a MAJOR bump: `0.3.0 →
+  1.0.0`.
+- `README.md`, `CLAUDE.md`, and `CONTRIBUTING.md` updated for the new output shape and paths.
+
+## [0.3.0] - 2026-07-02
+
+### Added
 - **New pipeline stage `agent-domain-spec`** (skill + playbook) between `run` and `grill-to-brief`.
   Turns the research dossier + MVP core loop into `Agent-Domain-Spec.md` — how the nghiệp-vụ is
   agent-ised: domain thesis, human/agent/tool role split, core objects, object lifecycle/state

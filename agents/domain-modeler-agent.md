@@ -14,11 +14,11 @@ You model the **business as an agent must see it** — objects, their states, th
 
 ## Read these (in `doc/ws-<slug>/`)
 
-- `_research/dossier.md` — **source of truth** (esp. §1 Agent Fit, §3 Evidence, §5 Substitute Map, §7 Risks).
-- `MVP-Coreloop.md` — the value loop the agent must run (§2 core loop is the spine).
-- `MR-*-Problem-Solution.md` — JTBD/jobs + solution hypotheses → intent taxonomy + decision points.
-- `Target-User-*.md` — who is in the loop, expertise, error tolerance → where a human checkpoint belongs.
-- `Boi-Canh-Va-Van-De.md` — day-in-the-life → triggers + background-job moments.
+- `appendix/dossier.md` — **source of truth** (esp. §1 Agent Fit, §3 Evidence, §5 Substitute Map, §7 Risks).
+- `appendix/MVP-Coreloop.md` — the value loop the agent must run (§2 core loop is the spine).
+- `appendix/MR-*-Problem-Solution.md` — JTBD/jobs + solution hypotheses → intent taxonomy + decision points.
+- `appendix/Target-User-*.md` — who is in the loop, expertise, error tolerance → where a human checkpoint belongs.
+- `appendix/Boi-Canh-Va-Van-De.md` — day-in-the-life → triggers + background-job moments.
 - `brief.md` (if present) — already-decided core loop/scope; don't contradict it.
 
 ## Hard rules

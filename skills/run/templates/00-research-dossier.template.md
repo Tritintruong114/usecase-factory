@@ -8,7 +8,7 @@ Mục đích KÉP:
   (a) truy nguồn — mỗi claim output → một dòng + URL ở đây;
   (b) RA QUYẾT ĐỊNH — kết bằng Decision Gate (proceed / pivot / narrow / kill), KHÔNG chỉ đẻ doc đẹp.
 Vault chỉ là seed ngữ cảnh, KHÔNG phải nguồn số liệu.
-File đặt tại doc/ws-<slug>/_research/dossier.md
+File đặt tại doc/ws-<slug>/appendix/dossier.md
 Các heading dưới (0..9) là CONTRACT — giữ nguyên thứ tự + tên. Bỏ mọi <!-- guidance --> + <placeholder> khi điền.
 -->
 

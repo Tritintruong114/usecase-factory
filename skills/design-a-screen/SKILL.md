@@ -87,14 +87,14 @@ Produce ONE merged ASCII mockup as the agreed design.
 
 ### 6. Persist
 
-Write the outcome to `doc/ws-<name>/mockups.md` (or the nearest planning folder for the work). Capture:
+Write the outcome to `doc/ws-<name>/appendix/mockups.md` (or the nearest planning folder for the work) — it's a prototype/coverage-check artifact, not a primary deliverable, so it belongs in the appendix alongside the research it grounds against. Capture:
 
 - The chosen ASCII mockup(s) per screen, with each state.
 - IA decisions (nav shape, screen list, action placement) as a short list.
 - Palette-gaps found → bespoke components that need building (feed these to planning/grill).
 - One line per rejected layout: what it was and why it lost (so the choice is auditable later).
 
-Persist as decisions crystallise — don't batch to the end. This file (`mockups.md`) is the human-alignment artifact and the coverage GATE a later PRD/FE step reads; `/usecase-factory:brief-to-html` renders the prototype from the screen brief and only cross-checks coverage against this ASCII map (it does NOT render from the ASCII — that would anchor the output to a crude grid).
+Persist as decisions crystallise — don't batch to the end. This file (`appendix/mockups.md`) is the human-alignment artifact and the coverage GATE a later PRD/FE step reads; `/usecase-factory:brief-to-html` renders the prototype from the screen brief and only cross-checks coverage against this ASCII map (it does NOT render from the ASCII — that would anchor the output to a crude grid).
 
 ## Anti-patterns
 

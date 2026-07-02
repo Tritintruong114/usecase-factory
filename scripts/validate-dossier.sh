@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # validate-dossier.sh — check a Use-Case Factory research dossier honors the heading contract.
 # Usage: validate-dossier.sh <path-to-dossier.md>
-# Default path: doc/ws-<slug>/_research/dossier.md
+# Default path: doc/ws-<slug>/appendix/dossier.md
 # Exit 0 = all checks pass. Exit 1 = at least one check failed.
 
 set -euo pipefail

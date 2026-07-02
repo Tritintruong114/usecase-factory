@@ -6,9 +6,11 @@ Nhiệm vụ: biến **research dossier + MVP core loop** thành một **Agent D
 
 ```mermaid
 flowchart TD
-    R["dossier + 4 doc + MVP-Coreloop<br/>(research + Decision Gate = Proceed)"] --> AD["/usecase-factory:agent-domain-spec<br/>(playbook này — ra SPEC NGHIỆP-VỤ-AGENT)"]
+    R["appendix/dossier.md + 4 doc + MVP-Coreloop<br/>(research + Decision Gate = Proceed)"] --> AD["/usecase-factory:agent-domain-spec<br/>(playbook này — ra SPEC NGHIỆP-VỤ-AGENT)"]
     AD --> ADS["Agent-Domain-Spec.md<br/>(object · lifecycle · intent · signal · decision · approval · guardrail · learning · jobs · OpenClaw map)"]
-    ADS --> G["/usecase-factory:grill-to-brief → screens-brief.md<br/>(UI = PROJECTION của spec này)"]
+    ADS --> PM["01-PRODUCT-MAP.md<br/>(Decision Pack — pain→user→workflow→agent job→giá trị→moat, V0 cut)"]
+    PM --> SH["cập nhật 00-START-HERE.md"]
+    SH --> G["/usecase-factory:grill-to-brief → screens-brief.md<br/>(UI = PROJECTION của spec này)"]
     G --> DS["design-a-screen (ASCII) → brief-to-html (HTML)"]
     DS --> OC["OpenClaw implementation (ngoài plugin)"]
 ```
@@ -36,7 +38,7 @@ flowchart TD
 ## Step 1 — Resolve + đọc input (setup)
 
 - Slug = arg. Workspace = `doc/ws-<slug>/`.
-- **Đọc bắt buộc:** `_research/dossier.md` (source of truth) + `MVP-Coreloop.md` (core loop §2 = spine) + `MR-*-Problem-Solution.md` (JTBD → intent) + `Target-User-*.md` (ai trong loop, ngưỡng lỗi → checkpoint người) + `Boi-Canh-Va-Van-De.md` (day-in-life → trigger/background job). Đọc `brief.md` nếu có (đừng suy lại core loop nó đã chốt).
+- **Đọc bắt buộc:** `appendix/dossier.md` (source of truth) + `appendix/MVP-Coreloop.md` (core loop §2 = spine) + `appendix/MR-*-Problem-Solution.md` (JTBD → intent) + `appendix/Target-User-*.md` (ai trong loop, ngưỡng lỗi → checkpoint người) + `appendix/Boi-Canh-Va-Van-De.md` (day-in-life → trigger/background job). Đọc `brief.md` nếu có (đừng suy lại core loop nó đã chốt). Đọc `00-START-HERE.md` để biết verdict + trạng thái pipeline hiện tại (file này sẽ được cập nhật ở Step 8).
 - **Precondition (DỪNG nếu thiếu):** thiếu `dossier.md` hoặc `MVP-Coreloop.md` → nói rõ thiếu cái nào và dừng; không thể agent-hóa khi chưa có nghiệp vụ + vòng lặp.
 - **Gate verdict:** chỉ chạy tiếp khi dossier §8 = **Proceed**. Pivot/Narrow/Kill → trình lại quyết định cho user, không tự vượt.
 
@@ -96,9 +98,20 @@ Tự soi, show kết quả (đừng tự sửa âm thầm cái cần user quyế
 
 Spawn **`agent-logic-reviewer`** (read-only). Đưa nó `Agent-Domain-Spec.md` + dossier. Nó cố **refute**: over-automation, missing/weak approval gate, ambiguous/unreachable state, thin guardrail, confidence escape-hatch thiếu, learning loop nới quyền âm thầm, claim không trace, và (nếu đã có brief) mismatch spec ↔ screen-brief. Dùng dissent của nó để vá spec — nó cố vấn, bạn quyết. Nếu nó trả "hold" vì over-automation / thiếu approval gate → sửa trước khi handoff.
 
-## Step 6 — Validate + persist
+## Step 6 — Synthesize `01-PRODUCT-MAP.md` (Decision Pack)
 
-Đảm bảo `doc/ws-<slug>/Agent-Domain-Spec.md` đủ 20 section, sạch placeholder. Chạy:
+Từ template `templates/07-product-map.template.md`, viết `doc/ws-<slug>/01-PRODUCT-MAP.md` — bản đồ quyết định sản phẩm MỘT TRANG cho product/người quyết định, KHÔNG phải research summary. Đây là PROJECTION của `Agent-Domain-Spec.md` + 4 doc research — rút, không lặp lại:
+
+- **Chuỗi pain → user → workflow → agent job → giá trị kinh doanh → moat** — mỗi ô trỏ về một section cụ thể (`appendix/*.md` hoặc `Agent-Domain-Spec.md`). "Agent job" phải là MỘT câu trả lời được: người dùng thuê agent này để làm việc gì ĐAU và LẶP LẠI — giọng user, không phải giọng builder.
+- **Core loop + agent hoạt động** — core loop (từ MVP-Coreloop §2), agent actions v0 (§8/§12), human approval points (§11), guardrails (§14), success metrics (§18).
+- **KHÔNG build ở V0** — liệt rõ tính năng/action/screen bị hoãn có chủ đích (từ MVP-Coreloop §5 + Agent-Domain-Spec §19), kèm lý do. Đây là hàng rào chặn scope creep, không phải wishlist.
+- **Rủi ro lớn nhất cần người quyết định tiếp** — một câu hỏi mở, từ dossier §7-§8 hoặc §19.
+
+Không tự bịa thêm quyết định sản phẩm ở tầng này — ô nào không trỏ về được nguồn cụ thể là một giả định, ghi rõ.
+
+## Step 7 — Validate + persist
+
+Đảm bảo `doc/ws-<slug>/Agent-Domain-Spec.md` đủ 20 section, sạch placeholder, và `01-PRODUCT-MAP.md` tồn tại cạnh nó. Chạy:
 
 ```
 bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-agent-domain-spec.sh doc/ws-<slug>/Agent-Domain-Spec.md
@@ -106,9 +119,17 @@ bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-agent-domain-spec.sh doc/ws-<slug>/A
 
 MISS nào → sửa rồi chạy lại tới khi PASS.
 
-## Step 7 — Handoff sang grill-to-brief
+## Step 8 — Cập nhật `00-START-HERE.md`
 
-Trình: spec đã ghi + verdict reviewer + biggest open risk (§19). Bàn giao cho `/usecase-factory:grill-to-brief <slug>`:
+Mở `doc/ws-<slug>/00-START-HERE.md` (đã có từ `/usecase-factory:run`) và cập nhật — KHÔNG tạo file mới, KHÔNG viết đè verdict/tóm tắt đã có:
+
+- Routing table: xác nhận dòng "Product" trỏ tới `01-PRODUCT-MAP.md` và dòng "Builder" đã có `Agent-Domain-Spec.md`.
+- Trạng thái pipeline: tick `agent-domain-spec`, thay dòng "Chưa có" của nó bằng "Xong — xem Agent-Domain-Spec.md + 01-PRODUCT-MAP.md".
+- Cập nhật "Cập nhật lần cuối" (ngày + tên stage) ở dòng Verdict.
+
+## Step 9 — Handoff sang grill-to-brief
+
+Trình: spec đã ghi + product map + verdict reviewer + biggest open risk (§19). Bàn giao cho `/usecase-factory:grill-to-brief <slug>`:
 
 - Screen brief phải là **PROJECTION của spec này** — mỗi màn surface một phần của nghiệp-vụ-agent: object/state user cần thấy, decision/approval cần một bề mặt, background job cần một thông báo. KHÔNG phát minh nghiệp vụ mới ở grill.
 - Mỗi state user-thật-chạm ở §4/§8/§11 phải có một màn hoặc một bề mặt off-dashboard (chat/notification/approval queue) trong brief.
@@ -126,5 +147,6 @@ Trình: spec đã ghi + verdict reviewer + biggest open risk (§19). Bàn giao c
 - **KHÔNG để phần nào treo ngoài OpenClaw map** (§17).
 - **KHÔNG vượt Decision Gate** — chỉ chạy khi Proceed; verdict khác thì trình lại.
 - **KHÔNG dồn write** — capture từng section ngay khi chốt.
+- **KHÔNG để `01-PRODUCT-MAP.md` thành research summary** — mỗi dòng phải là một quyết định/chuỗi trace được, không phải chép lại dossier.
 
-**Command này kết thúc khi:** `doc/ws-<slug>/Agent-Domain-Spec.md` tồn tại, đủ 20 section, validator PASS, mọi action đã phân loại approval + có guardrail, OpenClaw map đầy đủ, và reviewer không còn "hold".
+**Command này kết thúc khi:** `doc/ws-<slug>/Agent-Domain-Spec.md` tồn tại (đủ 20 section, validator PASS, mọi action đã phân loại approval + có guardrail, OpenClaw map đầy đủ, reviewer không còn "hold"), `01-PRODUCT-MAP.md` tồn tại cạnh nó, và `00-START-HERE.md` đã cập nhật routing + trạng thái pipeline.

@@ -11,7 +11,7 @@ This skill is a **thin router**. All execution logic lives in `playbook.md` next
 
 Before doing anything else, **read `playbook.md`** in this skill's directory (`${CLAUDE_PLUGIN_ROOT}/skills/run/playbook.md`) end to end. It is the official execution guide: the 8-step flow, the worker-agent specs, the evidence-class rules, the dossier contract, the Decision Gate decision tree, and the handoff rules. Do not run from this router alone — the router only names the steps; the playbook defines how to do them.
 
-Templates to copy live in `${CLAUDE_PLUGIN_ROOT}/skills/run/templates/` (`00-research-dossier` … `04-mvp-coreloop`).
+Templates to copy live in `${CLAUDE_PLUGIN_ROOT}/skills/run/templates/` (`00-research-dossier` … `04-mvp-coreloop`, plus `08-start-here` for the Decision Pack entry point).
 Validation scripts live in `${CLAUDE_PLUGIN_ROOT}/scripts/` (`validate-dossier.sh`, `coverage-check.sh`).
 
 ## Input
@@ -29,30 +29,32 @@ Validation scripts live in `${CLAUDE_PLUGIN_ROOT}/scripts/` (`validate-dossier.s
 
 ## The flow (each step is defined in the playbook)
 
-1. **Resolve + read** — resolve `<slug>` → `doc/ws-<slug>/`, create `_research/`, read `brief.md` seed + any prior research. This is setup, NOT research. Identify the gap.
+1. **Resolve + read** — resolve `<slug>` → `doc/ws-<slug>/`, create `appendix/`, read `brief.md` seed + any prior research. This is setup, NOT research. Identify the gap.
 2. **Agent Fit Check** — early filter: why must this be an AI Agent (not plain SaaS / automation / chatbot / human VA / manual)? Score 6 axes. Weak fit raises a flag; research still runs to prove/disprove.
 3. **Spawn parallel research agents** — fan out in ONE message, multiple Agent calls. Use the bundled worker agents (market-sizing-researcher, jtbd-pain-researcher, competitor-substitute-researcher, persona-wtp-researcher). Each runs a real web deep-research pass and returns a structured report.
-4. **Build the dossier** — assemble all worker reports into `_research/dossier.md` (template `00`). Headings 0–9 are a CONTRACT. The dossier is the SINGLE source of truth.
-5. **Synthesize 4 output docs** — copy templates `01`–`04`, fill ONLY with evidence (+ URL/label) present in the dossier.
+4. **Build the dossier** — assemble all worker reports into `appendix/dossier.md` (template `00`). Headings 0–9 are a CONTRACT. The dossier is the SINGLE source of truth.
+5. **Synthesize 4 output docs** — copy templates `01`–`04`, fill ONLY with evidence (+ URL/label) present in the dossier. Write into `appendix/`.
 6. **Coverage pre-check** — self-run the grill-gate checklist; report results, do not add screens.
 7. **Decision Gate** — pick exactly ONE: Proceed / Pivot / Narrow / Kill, with rationale, confidence, top evidence IDs, biggest risk. Optionally consult the bundled `decision-gate-reviewer` agent as an adversarial check.
-8. **Handoff** — list outputs + verdict. Only Proceed hands off downstream; Pivot/Narrow/Kill stops and presents the decision.
+8. **Write `00-START-HERE.md`** — the Decision Pack entry point (template `08`): verdict, a 5–10 line summary, why, and role-based routing. This is the file a reader opens first, at whatever gate the run stops.
+9. **Handoff** — list outputs + verdict. Only Proceed hands off downstream; Pivot/Narrow/Kill stops and presents the decision.
 
 ## Required outputs (write into `doc/ws-<slug>/`)
 
 The command is NOT done until all of these exist:
 
-- `doc/ws-<slug>/_research/dossier.md` — with a filled **Decision Gate** (§8) and **Evidence Table** (§3)
-- `doc/ws-<slug>/Boi-Canh-Va-Van-De.md`
-- `doc/ws-<slug>/MR-<slug>-Problem-Solution.md`
-- `doc/ws-<slug>/Target-User-<slug>.md`
-- `doc/ws-<slug>/MVP-Coreloop.md`
+- `doc/ws-<slug>/00-START-HERE.md` — verdict + summary + why + role-based routing (product / builder / appendix)
+- `doc/ws-<slug>/appendix/dossier.md` — with a filled **Decision Gate** (§8) and **Evidence Table** (§3)
+- `doc/ws-<slug>/appendix/Boi-Canh-Va-Van-De.md`
+- `doc/ws-<slug>/appendix/MR-<slug>-Problem-Solution.md`
+- `doc/ws-<slug>/appendix/Target-User-<slug>.md`
+- `doc/ws-<slug>/appendix/MVP-Coreloop.md`
 - A Decision Gate verdict: **Proceed / Pivot / Narrow / Kill**
 
 Verify before finishing:
 
 ```
-bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-dossier.sh doc/ws-<slug>/_research/dossier.md
+bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-dossier.sh doc/ws-<slug>/appendix/dossier.md
 bash ${CLAUDE_PLUGIN_ROOT}/scripts/coverage-check.sh doc/ws-<slug> <slug>
 ```
 

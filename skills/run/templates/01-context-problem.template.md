@@ -11,7 +11,7 @@ status: draft
 INPUT #1 của /usecase-factory:grill-to-brief — "Context & Problem".
 Mục đích: cho grill cái DÒNG ĐỜI (user-day moments) + VẤN ĐỀ CỐT LÕI.
 Mỗi màn ở screens-brief phải neo về một mốc trong §2 ("sáng mở ra thấy inbox tồn").
-File đặt tại doc/ws-<slug>/Boi-Canh-Va-Van-De.md
+File đặt tại doc/ws-<slug>/appendix/Boi-Canh-Va-Van-De.md
 -->
 
 # Bối cảnh & Vấn đề

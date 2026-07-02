@@ -22,12 +22,12 @@ KHÔNG brainstorm tính năng. Lấy đúng cái spec + research nói user cần
 
 > **Input chính = `Agent-Domain-Spec.md`.** Đọc nó TRƯỚC: nó định nghĩa nghiệp vụ agent đã được agent-hóa thế nào (object/state/decision/approval/job). Mọi màn trace về một lát của spec này. **Thiếu `Agent-Domain-Spec.md`** (workspace cũ, chạy trước khi có tầng này) → **CẢNH BÁO MẠNH**: brief sẽ nông vì phải tự suy nghiệp vụ từ 4 doc, dễ bịa decision/approval/state không có thật. Đề xuất user chạy `/usecase-factory:agent-domain-spec <slug>` trước. Nếu user xác nhận chạy tiếp → **fallback** về 4 doc research (vẫn được, nhưng ghi rõ trong brief là "không có Agent Domain Spec — nghiệp vụ suy từ research, cần spec hóa sau").
 
-Đọc từ `doc/ws-<slug>/` (hoặc nơi user chỉ) TRƯỚC khi hỏi bất cứ gì:
+Đọc từ `doc/ws-<slug>/appendix/` (hoặc nơi user chỉ) TRƯỚC khi hỏi bất cứ gì:
 
-1. **Context & Problem** (vd `Boi-Canh-Va-Van-De.md`) — dòng đời các pain + vấn đề cốt lõi. Nguồn của **user-day moment** ("sáng: lướt inbox tồn qua đêm chưa trả").
-2. **MR / Jobs-to-be-Done** (vd `MR-*.md`) — bảng JTBD đã chấm ưu tiên (J1, J2, …) theo Frequency × Pain × Willingness-to-pay, các giả thuyết giải pháp, scope MVP. Nguồn của **job nào đáng + ưu tiên**.
-3. **Target User** (vd `Target-User-*.md`) — persona, hồ sơ nghiệp vụ, expertise, thiết bị, đặc điểm phân biệt. Nguồn của **mọi màn chấm qua góc nhìn của ai**.
-4. **MVP & Core Loop** (vd `MVP-Coreloop.md`) — scope v0 đã chốt + core loop (vòng giá trị lặp user chạy: trigger → action → payoff → return). Nguồn của **MVP cut line** (màn nào v0 vs hoãn) và **màn nào gánh "pull" của loop** (màn loop là v0 bất di bất dịch). Nếu dự án giữ cái này trong `brief.md` → đọc ở đó.
+1. **Context & Problem** (vd `appendix/Boi-Canh-Va-Van-De.md`) — dòng đời các pain + vấn đề cốt lõi. Nguồn của **user-day moment** ("sáng: lướt inbox tồn qua đêm chưa trả").
+2. **MR / Jobs-to-be-Done** (vd `appendix/MR-*.md`) — bảng JTBD đã chấm ưu tiên (J1, J2, …) theo Frequency × Pain × Willingness-to-pay, các giả thuyết giải pháp, scope MVP. Nguồn của **job nào đáng + ưu tiên**.
+3. **Target User** (vd `appendix/Target-User-*.md`) — persona, hồ sơ nghiệp vụ, expertise, thiết bị, đặc điểm phân biệt. Nguồn của **mọi màn chấm qua góc nhìn của ai**.
+4. **MVP & Core Loop** (vd `appendix/MVP-Coreloop.md`) — scope v0 đã chốt + core loop (vòng giá trị lặp user chạy: trigger → action → payoff → return). Nguồn của **MVP cut line** (màn nào v0 vs hoãn) và **màn nào gánh "pull" của loop** (màn loop là v0 bất di bất dịch). Nếu dự án giữ cái này trong `brief.md` → đọc ở đó.
 
 Có `brief.md` (từ `/usecase-factory:use-case-brief`) → đọc luôn; đừng suy lại cái nó đã chốt.
 
@@ -131,6 +131,13 @@ Mỗi màn, `/usecase-factory:copy-writer` sinh ra và bạn ghi vào block **Co
 
 Bước này là một LỚP copy phủ lên spec, không phải vẽ lại — nó không bao giờ đổi màn nào tồn tại hay màn để làm gì (cái đó đã khoá ở bước 2–4).
 
+### 8. Cập nhật `00-START-HERE.md`
+
+Mở `doc/ws-<slug>/00-START-HERE.md` (đã có từ `run` + `agent-domain-spec`) và cập nhật — KHÔNG tạo file mới, KHÔNG viết đè verdict/tóm tắt/product-map đã có:
+
+- Routing table: xác nhận dòng "Builder" đã trỏ tới `screens-brief.md` (chuỗi `Agent-Domain-Spec.md` → `screens-brief.md` → `mockups.html`).
+- Trạng thái pipeline: tick `grill-to-brief`, thay dòng "Chưa có" bằng "Xong — xem screens-brief.md".
+
 ## The Screen Brief contract
 
 > Field key + section heading giữ NGUYÊN (khớp gold-standard `screens-brief.md` thật — `/usecase-factory:design-a-screen` đọc đúng shape này). Chỉ value điền tiếng Việt.
@@ -220,7 +227,7 @@ Bước này là một LỚP copy phủ lên spec, không phải vẽ lại — 
 - **KHÔNG dồn write** — capture từng màn vào file ngay khi grill (ghi tăng dần, không gom tới cuối).
 - **KHÔNG để doc nguồn dày thay cho grill.** Dù `brief.md` đã liệt sẵn màn, các gate decision (screen-set, screen-hay-không, lỗ hổng, cut line) vẫn nêu + confirm từng cái một. Tự điền từ doc rồi viết file một phát = phá skill — user phải trong vòng lặp ở mọi quyết định đáng kể.
 
-**Command này kết thúc khi:** `doc/ws-<slug>/screens-brief.md` tồn tại — mọi màn đã grill (purpose · moment · job · actions+outcomes · states), two-way coverage sạch (không orphan / không job CAO hở / không dead-end CTA), MVP cut line đã kẻ, flows vẽ đầu-cuối, copy pass đã áp.
+**Command này kết thúc khi:** `doc/ws-<slug>/screens-brief.md` tồn tại — mọi màn đã grill (purpose · moment · job · actions+outcomes · states), two-way coverage sạch (không orphan / không job CAO hở / không dead-end CTA), MVP cut line đã kẻ, flows vẽ đầu-cuối, copy pass đã áp, và `00-START-HERE.md` đã cập nhật routing + trạng thái pipeline.
 
 ## Bộ vàng tham chiếu
 

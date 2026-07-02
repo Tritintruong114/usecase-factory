@@ -11,12 +11,13 @@ flowchart TD
     B2 -->|"clearly weak fit"| FLAG["Flag: pivot / reframe non-agent<br/>(still research to prove it)"]
     B2 -->|"fit ok"| B3
     FLAG --> B3["Step 3 · Spawn N research worker agents on the INTERNET<br/>A:Market sizing · B:JTBD/pain · C:Competitor + substitute · D:Persona/WTP"]
-    B3 --> B4["Step 4 · _research/dossier.md<br/>layered evidence (must-cite/infer/assumption)<br/>+ sweep + fit + substitute map + Decision Gate"]
-    B4 -->|"Step 5 · synthesize: only what has a row + source/label in the dossier"| OUT["4 outputs"]
+    B3 --> B4["Step 4 · appendix/dossier.md<br/>layered evidence (must-cite/infer/assumption)<br/>+ sweep + fit + substitute map + Decision Gate"]
+    B4 -->|"Step 5 · synthesize: only what has a row + source/label in the dossier"| OUT["4 outputs into appendix/"]
     OUT --> B6["Step 6 · Coverage pre-check"]
     B6 --> B7{"Step 7 · Decision Gate"}
-    B7 -->|"Pivot / Narrow / Kill"| STOP["Present decision (no handoff)"]
-    B7 -->|"Proceed"| B8["Step 8 · Handoff"]
+    B7 -->|"Pivot / Narrow / Kill"| STOP["Step 8 · 00-START-HERE.md<br/>(present decision, no handoff)"]
+    B7 -->|"Proceed"| B8["Step 8 · 00-START-HERE.md"]
+    B8 --> B9["Step 9 · Handoff"]
 ```
 
 > A vault / `brief.md` is **not a research source**. It is an optional **seed**: read it to know what is already decided (core loop, scope, positioning) and to avoid contradicting it. Market data (size, competitors, pain, pricing) comes from the **internet**.
@@ -46,7 +47,7 @@ flowchart TD
 > - **Resolve** = from `slug` (arg) → lock the workspace path `doc/ws-<slug>/` + create the output folder.
 > - **Read** = read existing **internal seed** (`brief.md`, prior research) to know what is decided + avoid contradiction. NOT a data source.
 
-- Slug = first arg token. Workspace = `doc/ws-<slug>/`. Create `doc/ws-<slug>/_research/` if missing.
+- Slug = first arg token. Workspace = `doc/ws-<slug>/`. Create `doc/ws-<slug>/appendix/` if missing — this is where the dossier + 4 research docs live (evidence, kept out of the way of the Decision Pack's entry docs).
 - **Read `brief.md`** if present (one-liner, business, target audience, problem, CORE LOOP, MVP scope) — to bound the research + avoid contradiction. NOT a data source.
 - **Read prior research/output** if it exists — do NOT overwrite good content; only fill gaps. Note changes in the dossier.
 - **Research preconditions** — do NOT spawn workers until all four are present:
@@ -125,9 +126,9 @@ Recommended synthesis: <suggestions for output>
 - **assumption** claims (WTP, urgency, switching, integration, ROI) → label as assumption; never launder into fact.
 - No good source for a must-cite → record a **GAP**; do not infer a number.
 
-## Step 4 — Build `_research/dossier.md`
+## Step 4 — Build `appendix/dossier.md`
 
-Gather all worker reports into the dossier (template `templates/00-research-dossier.template.md`). **The dossier is the single source of truth for the 4 outputs + the decision.** Headings 0–9 are a CONTRACT:
+Gather all worker reports into the dossier (template `templates/00-research-dossier.template.md`), written to `doc/ws-<slug>/appendix/dossier.md`. **The dossier is the single source of truth for the 4 outputs + the decision.** Headings 0–9 are a CONTRACT:
 
 ```
 ## 0. Input
@@ -146,14 +147,14 @@ Rule: **output may only state what has a row + source/label in the dossier.** Ev
 
 ## Step 5 — Synthesize 4 outputs from the dossier
 
-Copy templates `01`–`04`, fill WITH evidence (+ URL/label) from the dossier, write into `doc/ws-<slug>/`:
+Copy templates `01`–`04`, fill WITH evidence (+ URL/label) from the dossier, write into `doc/ws-<slug>/appendix/`:
 
 | Template | → Output | Notes |
 |---|---|---|
-| `01-context-problem` | `Boi-Canh-Va-Van-De.md` | day-in-the-life (§2) from worker B + core problem |
-| `02-mr-problem-solution` | `MR-<slug>-Problem-Solution.md` | JTBD (§1) + hypothesis (§2) + **competitors + substitute/workaround (§4)** from worker C + §0 layered evidence |
-| `03-target-user` | `Target-User-<slug>.md` | persona from worker A (§3) + worker D (§1,2,4,6,7) |
-| `04-mvp-coreloop` | `MVP-Coreloop.md` | core loop + cut line — **take from brief.md if present**, NOT web research |
+| `01-context-problem` | `appendix/Boi-Canh-Va-Van-De.md` | day-in-the-life (§2) from worker B + core problem |
+| `02-mr-problem-solution` | `appendix/MR-<slug>-Problem-Solution.md` | JTBD (§1) + hypothesis (§2) + **competitors + substitute/workaround (§4)** from worker C + §0 layered evidence |
+| `03-target-user` | `appendix/Target-User-<slug>.md` | persona from worker A (§3) + worker D (§1,2,4,6,7) |
+| `04-mvp-coreloop` | `appendix/MVP-Coreloop.md` | core loop + cut line — **take from brief.md if present**, NOT web research |
 
 Synthesis rules:
 
@@ -206,9 +207,21 @@ Every decision MUST record (dossier §8): **rationale · confidence (High/Med/Lo
 
 **Optional adversarial check:** before committing the verdict, you may consult the bundled `decision-gate-reviewer` agent. Hand it the dossier; it independently re-scores the tree and tries to refute the proposed verdict. Use its dissent to harden the rationale — it advises, you decide.
 
-## Step 8 — Handoff
+## Step 8 — Write `00-START-HERE.md` (the Decision Pack entry point)
 
-List: `_research/dossier.md` + the 4 output files + any open pre-check flags + the number of verified web sources + the **Decision Gate** verdict.
+Every run, regardless of verdict, writes `doc/ws-<slug>/00-START-HERE.md` from `templates/08-start-here.template.md`. This is the file whoever opens the workspace reads FIRST — including someone who stops right here because the verdict is Pivot/Narrow/Kill. Fill:
+
+- **Verdict** + confidence + today's date.
+- **5–10 line summary** — what the use case is, for whom, the pain, why it needs an agent (not plain SaaS/automation), the business value if it works. Written for someone who has read nothing else in the workspace.
+- **Why this verdict** — 2–4 sentences straight from dossier §8's rationale + biggest unresolved risk. Decision voice, not research-summary voice.
+- **Routing table** — Product → `01-PRODUCT-MAP.md`; Builder → `Agent-Domain-Spec.md` → `screens-brief.md` → `mockups.html`; Evidence → `appendix/`.
+- **Pipeline status checklist** — tick only `run`; every later stage stays unticked with a plain "Chưa có — chạy `/usecase-factory:<stage>`" note. Never describe a file that doesn't exist yet.
+
+Leave the template's Scope / Bước kế / Design system sections as honest "chưa có" placeholders (not guidance comments) — `brief-to-html` fills those in at the end of the pipeline. `agent-domain-spec` and `grill-to-brief` will update the routing/status sections of this same file as they run; don't duplicate it.
+
+## Step 9 — Handoff
+
+List: `appendix/dossier.md` + the 4 output files + `00-START-HERE.md` + any open pre-check flags + the number of verified web sources + the **Decision Gate** verdict.
 
 Hand off downstream — NOT as an "auto-convert into screen brief" frame:
 
@@ -232,7 +245,7 @@ If Decision = Pivot / Narrow / Kill → do NOT hand off; present the decision + 
 - **Do NOT** hide weak evidence — mark it.
 - **Do NOT** default blindly (neither "Proceed" nor "Narrow") — the Decision Gate scores by the Step 7 tree; dare to say pivot/narrow/kill when there's a real reason, and dare to Proceed when fit+pain+gap are enough even with WTP unverified.
 
-**This command ends when: the 4 grill-input files + the dossier (with a Decision Gate) are ready.**
+**This command ends when: `00-START-HERE.md` + the 4 grill-input files + the dossier (with a Decision Gate) are ready in `appendix/`.**
 
 ## When the web isn't enough
 

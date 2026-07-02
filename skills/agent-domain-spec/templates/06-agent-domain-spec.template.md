@@ -11,7 +11,7 @@ Mô hình tư duy (giữ trong đầu khi điền):
                         con người giữ kiểm soát rủi ro ở đâu, OpenClaw chạy nghiệp vụ bằng primitive nào.
   • Screen brief      = cách user NHÌN THẤY và ĐIỀU KHIỂN nghiệp vụ đó (grill-to-brief vẽ, là PROJECTION của file này).
 
-Nguồn: _research/dossier.md (source of truth) · MVP-Coreloop.md · MR/JTBD · Target-User · Boi-Canh (· brief.md).
+Nguồn: appendix/dossier.md (source of truth) · appendix/MVP-Coreloop.md · appendix/MR/JTBD · appendix/Target-User · appendix/Boi-Canh (· brief.md).
 File đặt tại doc/ws-<slug>/Agent-Domain-Spec.md
 Các heading dưới (0..19) là CONTRACT — giữ NGUYÊN thứ tự + tên (validator soi). Bỏ mọi <!-- guidance --> + <placeholder> khi điền.
 
@@ -28,7 +28,7 @@ cron/heartbeat · approval surfaces · guardrails · workspace state.
 
 - **Slug:** `<slug>`
 - **Decision Gate verdict:** `<Proceed (từ dossier §8) — chỉ chạy tiếp khi Proceed>`
-- **Sources read:** `<_research/dossier.md · MVP-Coreloop.md · MR-<slug>-Problem-Solution.md · Target-User-<slug>.md · Boi-Canh-Va-Van-De.md · brief.md (nếu có)>`
+- **Sources read:** `<appendix/dossier.md · appendix/MVP-Coreloop.md · appendix/MR-<slug>-Problem-Solution.md · appendix/Target-User-<slug>.md · appendix/Boi-Canh-Va-Van-De.md · brief.md (nếu có)>`
 - **Core loop (từ MVP-Coreloop §2):** `<dán lại 1 dòng core loop — spec này agent-hóa đúng vòng lặp này>`
 - **Trace rule:** mọi object / pain / job trong file này phải truy về một dòng trong dossier/4 doc. KHÔNG phát minh nghiệp vụ.
 

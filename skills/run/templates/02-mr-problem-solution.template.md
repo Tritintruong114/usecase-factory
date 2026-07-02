@@ -11,7 +11,7 @@ status: draft
 INPUT #2 của /usecase-factory:grill-to-brief — "MR / Jobs-to-be-Done".
 Mục đích: cho grill BẢNG JTBD đã xếp ưu tiên (J1..Jn) để chạy coverage 2 chiều + chọn cut line.
 LƯU Ý: JTBD là RESEARCH, KHÔNG map 1-1 ra màn. Đừng biến J# thành spec.
-File đặt tại doc/ws-<slug>/MR-<slug>-Problem-Solution.md
+File đặt tại doc/ws-<slug>/appendix/MR-<slug>-Problem-Solution.md
 -->
 
 # MR <Tên use-case> — Vấn đề & Giả thuyết giải pháp (phiên bản MVP)

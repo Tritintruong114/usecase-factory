@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# validate-agent-domain-spec.sh — check an Agent Domain Spec honors the heading contract.
+# validate-agent-domain-spec.sh — check an Agent Domain Spec honors the heading contract, and that
+# its required sibling 01-PRODUCT-MAP.md exists and is filled in (Decision Pack contract).
 # Usage: validate-agent-domain-spec.sh <path-to-Agent-Domain-Spec.md>
-# Default path: doc/ws-<slug>/Agent-Domain-Spec.md
+# Default path: doc/ws-<slug>/Agent-Domain-Spec.md (01-PRODUCT-MAP.md is expected next to it)
 # Exit 0 = all checks pass. Exit 1 = at least one check failed.
 
 set -euo pipefail
@@ -63,11 +64,34 @@ else
   miss "OpenClaw primitives (skills/tools/connectors/memory/sessions/cron/approval/guardrails/workspace state)"
 fi
 
+# `01-PRODUCT-MAP.md` is a required sibling — agent-domain-spec writes it right after the spec
+# itself (Decision Pack contract). Check it exists next to the spec and looks filled-in.
+SPEC_DIR=$(dirname "$SPEC")
+PRODUCT_MAP="$SPEC_DIR/01-PRODUCT-MAP.md"
+if [[ ! -f "$PRODUCT_MAP" ]]; then
+  miss "sibling 01-PRODUCT-MAP.md (expected at $PRODUCT_MAP — agent-domain-spec must write it alongside the spec)"
+else
+  pm_found=""
+  for p in '<placeholder>' 'TODO' '<slug>' '<Tên hiển thị>' '<!-- guidance'; do
+    if grep -Fq "$p" "$PRODUCT_MAP"; then
+      pm_found+=" '${p}'"
+    fi
+  done
+  if grep -Eq '<!--' "$PRODUCT_MAP"; then
+    pm_found+=" '<!-- comment -->'"
+  fi
+  if [[ -n "$pm_found" ]]; then
+    miss "01-PRODUCT-MAP.md still has placeholders:$pm_found"
+  else
+    pass "01-PRODUCT-MAP.md present + placeholder-free"
+  fi
+fi
+
 echo
 if [[ "$fail" -eq 0 ]]; then
-  echo "PASS  agent domain spec honors the heading contract."
+  echo "PASS  agent domain spec honors the heading contract and 01-PRODUCT-MAP.md is present."
   exit 0
 else
-  echo "FAIL  agent domain spec is missing required sections — see MISS lines above." >&2
+  echo "FAIL  agent domain spec is missing required sections/sibling — see MISS lines above." >&2
   exit 1
 fi

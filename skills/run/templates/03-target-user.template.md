@@ -11,7 +11,7 @@ status: draft
 INPUT #3 của /usecase-factory:grill-to-brief — "Target User".
 Mục đích: cung cấp LĂNG KÍNH chấm mọi màn — whose point of view.
 Phần quan trọng nhất cho grill: §4 đặc thù phân biệt (expertise, thiết bị, NGƯỠNG LỖI, tần suất ghé) + §5 một ngày của họ.
-File đặt tại doc/ws-<slug>/Target-User-<slug>.md
+File đặt tại doc/ws-<slug>/appendix/Target-User-<slug>.md
 -->
 
 # Chân dung khách hàng mục tiêu — <Tệp user>
