@@ -1,6 +1,8 @@
 {
   "name": "usecase-factory",
   "description": "ClawExperts Use-Case Factory for researching AI Agent product ideas and producing a build/pivot/narrow/kill decision.",
-  "version": "1.1.0",
-  "author": { "name": "ClawExperts" }
+  "version": "1.1.1",
+  "author": {
+    "name": "ClawExperts"
+  }
 }

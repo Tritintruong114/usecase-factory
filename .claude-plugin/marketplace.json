@@ -11,11 +11,20 @@
       "source": "./",
       "description": "Research an AI Agent product idea into a dossier + four research docs and a Proceed/Pivot/Narrow/Kill decision.",
       "version": "1.1.0",
-      "author": { "name": "ClawExperts", "email": "tintt@firegroup.io" },
+      "author": {
+        "name": "ClawExperts",
+        "email": "tintt@firegroup.io"
+      },
       "license": "MIT",
       "homepage": "https://github.com/Tritintruong114/usecase-factory",
       "repository": "https://github.com/Tritintruong114/usecase-factory",
-      "keywords": ["use-case", "market-research", "ai-agent", "discovery"]
+      "keywords": [
+        "use-case",
+        "market-research",
+        "ai-agent",
+        "discovery"
+      ]
     }
-  ]
+  ],
+  "version": "1.1.1"
 }

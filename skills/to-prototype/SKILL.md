@@ -1,90 +1,224 @@
 ---
 name: to-prototype
-description: Render an approved wireframe into an interactive, manipulable prototype that runs INSIDE new-design's real layout (sidebar + chrome) by reusing its actual components — the 4th "mock", after /mockup-to-html and before Phase-2 FE. Unlike mockup-to-html (a static viewer in doc/), this is live React with manipulable state — connect a channel or add a product and the onboarding step turns green; the demo toggle just seeds it. Generic — the skin and components come from a style reference (default new-design/), not baked in. Use after the ASCII wireframe + mockups.data.js are approved and the user wants to "build the interactive prototype", "make the mock clickable/manipulable", "turn the wireframe into a real prototype", or "render the 4th mock". Triggers on "to prototype", "interactive prototype", "manipulable prototype", "clickable mock inside new-design".
+description: Turn an approved wireframe/static mock into a Vite-powered interactive prototype that can be previewed locally as HTML and deployed/viewed on Vercel. Use after mockups.md + mockups.data.js exist and the user wants "to prototype", "interactive prototype", "clickable prototype", "Vite preview", or "render prototype". Output is a self-contained prototype source folder plus a built static preview, not production FE and not tied to new-design.
 disable-model-invocation: true
 ---
 
 # To Prototype
 
-Fourth and final "mock" of the design phase. Pipeline: `/design-a-screen` (ASCII MAP, the GATE) → `/mockup-to-html` (static interactive viewer in `doc/`) → **`/to-prototype`** (live manipulable prototype inside the real app). Still design-time and throwaway — NO real backend, NO FE↔BE contract. That is Phase-2 FE, a separate later step.
+Fourth and final "mock" of the design phase. Pipeline:
 
-## What makes this different from the 3 other mocks
+`/design-a-screen` → `/mockup-to-html` → **`/to-prototype`** → later Phase-2 FE.
+
+This skill converts the approved wireframe/static mock into a **live, manipulable prototype** backed by a small **Vite + React** source set. The prototype must still be previewable like an HTML artifact and deployable on Vercel, but it is no longer required to mount inside `new-design/`.
+
+## Core idea
+
+`to-prototype` produces two things in the target repo:
+
+1. **Source** — a self-contained Vite app under `prototype/`.
+2. **Preview artifact** — a static built preview copied to `prototype.html` / `prototype-assets/` so the repo can be opened/deployed like the old `mockups.html`.
+
+The goal: keep the convenience of `mockups.html` while adding real React state and actions.
+
+## What makes this different from the earlier mocks
 
 | Mock | Where | Fidelity | State |
 |---|---|---|---|
-| ASCII wireframe | `doc/ws-<name>/mockups.md` | sketch (the GATE) | none |
-| HTML wireframe | `doc/ws-<name>/mockups.{html,data.js}` | design-system, static | tab/state switch only |
-| **Prototype (this)** | `new-design/src/workspaces/<ws>/` | **real components, real layout** | **manipulable — actions mutate state** |
-| FE stub-data | the real FE repo | production code | real, backed by stubs (Phase-2) |
+| ASCII wireframe | `mockups.md`, `appendix/mockups.md`, or `doc/ws-<name>/mockups.md` | sketch / coverage gate | none |
+| HTML wireframe | `mockups.html` + `mockups.data.js` | static viewer | tab/state switch only |
+| **Prototype (this)** | `prototype/` source + `prototype.html` built preview | live React/Vite | **manipulable — actions mutate state** |
+| FE stub-data | the real FE repo | production code | real FE backed by stubs/contracts |
 
-The whole point of the prototype over the HTML wireframe: it reveals **flow + interaction** problems that switching tabs/states cannot. So the bar is: each discrete state in `mockups.data.js` (e.g. ov1 → ov2 → ov3) must be reachable by **real user action** (connect a channel, add a product), not a hidden toggle.
+The whole point of this prototype over the HTML wireframe: it reveals **flow + interaction** problems that switching tabs/states cannot. Every important state in `mockups.data.js` must be reachable by a user action (connect, add, approve, send, toggle, open modal...), not only by a hidden demo toggle.
 
-## HARD constraints (do NOT violate)
+## Hard constraints
 
-1. **Render INSIDE new-design.** The prototype mounts in new-design's `mock` screen panel, so the platform sidebar + chrome stay exactly as-is. Reuse new-design's real primitives via `../../ui` (`Card`, `Btn`, `Chip`, `Pill`, `Switch`, `Icon`, `useToast`, `ProgressBar`). NEVER build a parallel rail/topbar/shell, and never re-style `--cw-*` tokens — those come from new-design already.
-2. **Three-layer split — never inline literals.**
-   - components (`index.jsx`, `<tab>.jsx`, `bits.jsx`) = the **engine** (layout + behavior)
-   - `copy.js` = **content** — every static VN string lives here, edited in one place
-   - `fixtures.js` = **data** — EMPTY/SAMPLE records + the live-state seed/derive helpers
-3. **Manipulable state, derived UI.** Lift the shared workspace state (channel connections, product count, run on/off…) to the dashboard. DERIVE the UI (checklist, banners, KPIs) from it. The demo-data toggle only **seeds** that state; user actions then override it. This is what separates a prototype from a viewer.
-4. **No backend.** No `fetch`, no real schema/contract, no framework wiring beyond React state. Throwaway design-time artifact.
+1. **Self-contained Vite app.** Do not require `new-design/`, `../../ui`, or any external app shell. Create/modify `prototype/` in the target repo.
+2. **Still previewable as HTML.** After build, generate/copy a static entry at repo root:
+   - `prototype.html`
+   - `prototype-assets/`
+   Vercel must be able to serve it at `/prototype.html`.
+3. **Keep root Vercel friendly.** If the repo already has `index.html`, preserve it. If it is only a redirect to `mockups.html`, update it to link or redirect to `prototype.html` if the user wants prototype as default. Do not delete `mockups.html`.
+4. **Three-layer split.**
+   - `prototype/src/App.jsx` and components = engine/layout/behavior
+   - `prototype/src/copy.js` = static Vietnamese copy
+   - `prototype/src/fixtures.js` = data records + seed/derive helpers
+5. **Manipulable state, derived UI.** The app must own state, derive UI from it, and make each key state reachable by real clicks/forms.
+6. **No backend.** No real fetch, auth, DB, schema contract, or production integration. This is a throwaway design artifact.
+7. **Do not clobber existing work.** Inspect files first. Preserve existing `mockups.html`, `mockups.data.js`, `index.html`, Vercel config, and git changes unless the user explicitly asks to replace.
 
 ## Inputs
 
-1. **Wireframe** — `doc/ws-<name>/mockups.md` (the coverage GATE) **and** `doc/ws-<name>/mockups.data.js` (the per-screen state source the prototype must reproduce live). If either is missing/incomplete, STOP and send the user back to `/design-a-screen` → `/mockup-to-html`.
-2. **Style reference + components** — repo default **[new-design/](../../../new-design/)**. Tokens in [new-design/src/index.css](../../../new-design/src/index.css); shared primitives in [new-design/src/ui.jsx](../../../new-design/src/ui.jsx). The prototype reuses these directly (it lives inside new-design), so there is nothing to re-skin.
+Find these in the target repo, accepting the current repo conventions:
 
-## Output — file structure (the convention the sales pilot established)
+- Wireframe: first available of:
+  - `mockups.md`
+  - `appendix/mockups.md`
+  - `doc/ws-<name>/mockups.md`
+- Data source: first available of:
+  - `mockups.data.js`
+  - `appendix/mockups.data.js`
+  - `doc/ws-<name>/mockups.data.js`
+- Optional style reference:
+  - `design-system-tokens.css`
+  - existing `mockups.html`
 
-Everything under `new-design/src/workspaces/<ws>/`:
+If a wireframe or data source is missing/incomplete, STOP and tell the user to finish `/design-a-screen` → `/mockup-to-html` first.
 
-| File | Role |
-|---|---|
-| `index.jsx` | `<WsDashboard>` — header (emoji/title/subtitle + run-switch), tab strip (`wired` hero tabs vs `soon`), content router, floating demo-data toggle, global sandbox modal. Owns the lifted state + seed/derive. |
-| `<tab>.jsx` | one file per **wired hero tab**; reuse `../../ui`. Out-of-scope tabs stay `wired:false` ("soon"). |
-| `bits.jsx` | ws-specific primitives layered on `../../ui` (channel badges, status pills, fields…). |
-| `fixtures.js` | data layer — `EMPTY`/`SAMPLE` + `seed*()` (seed live state from a mode) + `build*()` (derive UI lists from live state). |
-| `copy.js` | content layer — one `COPY` object with all static VN copy; interpolated strings are functions. |
+## Output structure
 
-Plus ONE registry entry (auto-applied, see step 4) — no edits to App.jsx / rail.jsx.
+Create this in the target repo:
+
+```txt
+prototype/
+  package.json
+  index.html
+  vite.config.js
+  src/
+    main.jsx
+    App.jsx
+    styles.css
+    copy.js
+    fixtures.js
+    components/
+      bits.jsx
+      Overview.jsx
+      Sandbox.jsx
+prototype.html
+prototype-assets/
+```
+
+Recommended URLs after deploy:
+
+- `/prototype.html` = live Vite-built interactive prototype
+- `/mockups.html` = old static mockup viewer remains available
+- `/` = may redirect/link to `prototype.html` if this is the current approved preview
 
 ## Workflow
 
-### 1. Read inputs + confirm the GATE
-Read `mockups.md` and `mockups.data.js` end to end. List every tab, every state, every modal/empty/done. Decide which tabs are **hero (wired)** for the pilot vs **soon**. If coverage is incomplete, STOP — don't prototype an unfinished wireframe.
+### 1. Inspect the repo and protect changes
 
-### 2. Scaffold from `assets/`
-Copy the skeletons in [assets/](assets/) into `new-design/src/workspaces/<ws>/` and fill them:
-- [assets/index.jsx](assets/index.jsx) → `<WsDashboard>`: set TABS (wired/soon), header copy refs, demo-toggle, sandbox, and the **lifted state + `seed`/`build` + handlers** passed to tabs. Export it as a NAMED export `<Ws>Dashboard` (the registry imports it by name).
-- [assets/fixtures.js](assets/fixtures.js) → `EMPTY`/`SAMPLE` from `mockups.data.js`, plus `seedSetup(mode)` and `buildChecklist(setup)` (rename per ws). Data-bound copy (list rows, KPI numbers, pulse) lives HERE with its records.
-- [assets/copy.js](assets/copy.js) → move EVERY static string from the wireframe into `COPY`, grouped by area; interpolated ones become functions.
-- [assets/bits.jsx](assets/bits.jsx) → ws-specific primitives.
-- [assets/example-tab.jsx](assets/example-tab.jsx) → the canonical hero tab: shows reading `checklist`/`setup` props, **deriving UI from state**, **morphing between wireframe states** (ov1↔ov2), and pulling all copy from `COPY`. Clone it per hero tab.
+Run:
 
-### 3. Make each wireframe state reachable by action
-For every discrete state in `mockups.data.js`, wire the real action that reaches it (QR-scan → channel connected → step green; add-product → step green → ov2 morph). The demo toggle seeds the baseline; actions move between states live. Verify by clicking, not by reading.
-
-### 4. Wire into new-design (one registry entry)
-Add ONE entry to **[new-design/src/workspaces/registry.js](../../../new-design/src/workspaces/registry.js)** — the single source of truth that both App.jsx (screen dispatch) and rail.jsx (pinned sidebar rows) read. Do NOT touch App.jsx or rail.jsx; they map over the registry already.
-
-```js
-import { <Ws>Dashboard } from './<ws>';
-// …add to the PROTOTYPES array:
-{ id: 'mock-<ws>', label: '<Sidebar label>', title: '<hover tooltip>', initials: 'XX',
-  gradient: 'linear-gradient(140deg,#…,#…)', Component: <Ws>Dashboard },
+```bash
+git status --short --branch
+find . -maxdepth 3 -type f | sort
 ```
 
-`id` must be unique and non-empty (convention: `mock-<ws>`). Multiple prototypes coexist — each gets its own pinned row and screen.
+Do not overwrite unrelated modified files. If a conflicting prototype already exists, inspect it and update incrementally.
 
-### 5. Build + self-check
-`cd new-design && bun run build` must pass. Then grep the component files for stray VN literals — anything that isn't a comment, a status-enum key (in `bits.jsx`), or a data value (in `fixtures.js`) belongs in `copy.js`. Tell the user to run `bun run dev` and reach the prototype via the pinned sidebar row.
+### 2. Read the gate inputs
+
+Read wireframe and `mockups.data.js` end to end. List:
+
+- tabs/screens
+- empty/sample states
+- modals
+- CTAs/actions
+- state transitions
+- what must be wired now vs marked "soon"
+
+### 3. Scaffold or update the Vite source
+
+If `prototype/` does not exist, create it from `assets/vite/`.
+
+Minimum dependencies:
+
+```json
+{
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {}
+}
+```
+
+Use `base: './'` in `vite.config.js` so the built preview works from `/prototype.html` with relative assets.
+
+### 4. Implement the prototype
+
+Fill the Vite app from the mock:
+
+- `fixtures.js`: copy/adapt records from `mockups.data.js`; add `seedState(mode)` and derive helpers.
+- `copy.js`: put all static VN strings here.
+- `App.jsx`: tabs, mode toggle, lifted state, action handlers, content router.
+- Components: make important states reachable by clicks/forms, not only by demo data.
+- `styles.css`: copy/adapt visual tokens from `design-system-tokens.css` / `mockups.html` where useful, but keep it self-contained.
+
+### 5. Build and produce HTML preview artifact
+
+From target repo:
+
+```bash
+cd prototype
+npm install
+npm run build
+cd ..
+rm -rf prototype-assets
+cp -R prototype/dist/assets prototype-assets
+cp prototype/dist/index.html prototype.html
+python3 - <<'PY'
+from pathlib import Path
+p = Path('prototype.html')
+s = p.read_text()
+s = s.replace('./assets/', './prototype-assets/')
+p.write_text(s)
+PY
+```
+
+If the project uses Bun and `bun install` is already standard, Bun is allowed. Otherwise default to npm for portability.
+
+### 6. Verify
+
+Run:
+
+```bash
+python3 -m http.server 4174
+```
+
+Then check:
+
+```bash
+curl -I http://127.0.0.1:4174/prototype.html
+curl -I http://127.0.0.1:4174/prototype-assets/<built-js-file>
+```
+
+Also run:
+
+```bash
+cd prototype && npm run build
+```
+
+The build must pass before reporting done.
+
+### 7. Commit/deploy only when asked or clearly part of current flow
+
+If the user asks to deploy or the repo is already being Vercel-previewed, then:
+
+```bash
+git add prototype prototype.html prototype-assets index.html package-lock.json
+git commit -m "docs: add vite interactive prototype"
+git push origin main
+vercel --prod
+```
+
+Preserve exact deployment URLs and report them.
 
 ## Anti-patterns
-- Don't build a parallel shell/rail/topbar — mount inside new-design and reuse `../../ui`.
-- Don't hand-edit App.jsx / rail.jsx to wire a prototype — add a `registry.js` entry; they read the registry.
-- Don't re-skin `--cw-*` tokens — new-design owns the design system.
-- Don't inline VN copy in JSX — it goes in `copy.js`; data-bound copy goes in `fixtures.js`.
-- Don't make a state reachable only by the demo toggle — every wireframe state needs a real action path.
-- Don't wire real data/fetches/contracts — that's Phase-2 FE, not the prototype.
-- Don't run if `mockups.md` / `mockups.data.js` are missing or incomplete — send the user back up the pipeline.
-- Don't keep the old `<iframe src="mockups.html">` once the live prototype replaces it.
+
+- Do not require `new-design/`.
+- Do not touch production FE contracts.
+- Do not replace `mockups.html`; keep it as the static reference.
+- Do not make a giant inline `<script>` if a Vite source tree is expected.
+- Do not put all VN copy directly in JSX.
+- Do not fake interactivity with only a tab/state switch; actual CTAs must mutate state.
+- Do not break Vercel root or existing deployment paths.
