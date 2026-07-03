@@ -20,6 +20,17 @@ For **Agent Apps** the **Agent Domain Spec** stage is what stops the pipeline fr
 
 The pipeline is staged, so you can also stop at any gate (research-only, decision-only, domain-spec-only, or screen-brief-only) and hand off from there.
 
+### Alternate entry: you already have the product decided
+
+The three stages above (`run` → `agent-domain-spec` → `grill-to-brief`) exist to justify a screen set for an idea **nobody has decided yet**. If instead you already have documentation of something that **exists** — a reverse-engineered spec of a live app you're rebuilding, an old PRD, a design-system export with a screen-by-screen breakdown — skip straight to `/usecase-factory:handoff-to-brief <slug> <path to the doc>`. It extracts (rather than interviews) the same `screens-brief.md` contract straight from the doc, so `design-a-screen` and `brief-to-html` run unmodified afterward:
+
+```
+Existing product's handoff/design doc → Screen brief → ASCII (optional) → HTML → prototype
+        (already decided)                (handoff-to-brief) (design-a-screen)  (brief-to-html)
+```
+
+It never writes `Agent-Domain-Spec.md` / `01-PRODUCT-MAP.md` and never renders a Decision Gate verdict — those exist only to validate an undecided idea.
+
 ## The output shape — a Decision Pack, not a pile of files
 
 Every artifact in `doc/ws-<slug>/` falls into one of three tiers, and the file layout says so:
@@ -93,6 +104,9 @@ usecase-factory/
       playbook.md              # the full 8-step execution guide (read first)
       templates/
         05-screens-brief.template.md
+    handoff-to-brief/          # ALTERNATE entry — existing product's handoff doc → screens-brief.md
+      SKILL.md                 # thin router → the command /usecase-factory:handoff-to-brief
+      playbook.md              # extract-then-confirm workflow; reuses grill-to-brief's template
     copy-writer/               # UX microcopy — invoked by grill-to-brief step 7
       SKILL.md
     design-a-screen/           # screens-brief.md → ASCII wireframes (appendix/mockups.md)

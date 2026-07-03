@@ -9,6 +9,17 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to choose a version bump.
 ## [Unreleased]
 
 ### Added
+- **New skill `handoff-to-brief`** — an alternate pipeline entry point for when a product is
+  already decided and documented elsewhere (a reverse-engineered spec of a live app, an old PRD,
+  a design-system export with a per-screen breakdown), replacing `run` → `agent-domain-spec` →
+  `grill-to-brief` for that case. It extracts (rather than interviews) the same `screens-brief.md`
+  contract straight from the source doc — reusing `grill-to-brief`'s template verbatim — so
+  `design-a-screen` and `brief-to-html` run unmodified afterward. It never writes
+  `Agent-Domain-Spec.md`/`01-PRODUCT-MAP.md` and never renders a Decision Gate verdict; gate
+  decisions the source doc leaves genuinely open (⚠-flagged inconsistencies, live-vs-dead scope,
+  the v0/deferred cut line, which file holds the design tokens) are still always surfaced and
+  confirmed, never silently resolved.
+
 - **Decision Pack output shape.** `run` now also writes `doc/ws-<slug>/00-START-HERE.md` (template
   `08-start-here`) as soon as a verdict exists — a 5–10 line summary, the verdict + why, and
   role-based routing (product / builder / evidence). Every later stage (`agent-domain-spec`,

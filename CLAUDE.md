@@ -26,6 +26,15 @@ and a couple of bash validators. README.md is the user-facing doc; this file is 
                                                   ASCII only cross-checks coverage;
                                                   finalizes 00-START-HERE.md)
 ```
+
+**Alternate entry — `handoff-to-brief`.** `run` → `agent-domain-spec` → `grill-to-brief` all exist to
+justify a screen set for an idea nobody has decided yet. When the product is already decided and
+documented elsewhere (a reverse-engineered spec of a live app, an old PRD, a design-system export
+with a per-screen breakdown), `/usecase-factory:handoff-to-brief <slug> <path>` REPLACES all three:
+it extracts (not interviews) the same `screens-brief.md` contract straight from the doc, so
+`design-a-screen` and `brief-to-html` run unmodified afterward. It never writes
+`Agent-Domain-Spec.md` / `01-PRODUCT-MAP.md` and never renders a Decision Gate verdict.
+
 Every stage keeps a single **Decision Pack** current in `doc/ws-<slug>/`: `00-START-HERE.md`
 (verdict + summary + role-based routing, written by `run`, updated by every later stage) and
 `01-PRODUCT-MAP.md` (the product decision — pain → user → workflow → agent job → business value →
@@ -77,14 +86,18 @@ number in different folders.
 
 - `00`–`04` live in `skills/run/templates/` — dossier + 4 research docs, written into
   `doc/ws-<slug>/appendix/`.
-- `05-screens-brief` lives in `skills/grill-to-brief/templates/` → `screens-brief.md`.
+- `05-screens-brief` lives in `skills/grill-to-brief/templates/` → `screens-brief.md`. `handoff-to-brief`
+  reuses this SAME template file (no `09-*` template of its own) — the output contract is identical
+  whether the brief comes from a grill interview or an extracted handoff doc.
 - `06-agent-domain-spec` lives in `skills/agent-domain-spec/templates/` → `Agent-Domain-Spec.md`
   (headings §0–§19 are a contract — see `validate-agent-domain-spec.sh`).
 - `07-product-map` lives in `skills/agent-domain-spec/templates/` → `01-PRODUCT-MAP.md`, the
   product decision map (Decision Pack).
 - `08-start-here` lives in `skills/run/templates/` → `00-START-HERE.md`, the Decision Pack entry
   point — written by `run`, then updated (not re-created) by `agent-domain-spec`, `grill-to-brief`,
-  and `brief-to-html` as each stage's artifacts become available.
+  and `brief-to-html` as each stage's artifacts become available. On the `handoff-to-brief` entry
+  path, this same template is written directly by `handoff-to-brief` instead (with its `Verdict`
+  section swapped for a `Source` section — see that skill's playbook), since `run` never ran.
 
 If you change a template's headings, **update the matching validator** — heading names are a
 contract (see below).
@@ -143,8 +156,15 @@ and `scripts/coverage-check.sh` to match — otherwise valid output will fail va
   unless the maintainer explicitly confirms.
 
 ## In-flight note
-The 7 skills are `use-case-brief · run · agent-domain-spec · grill-to-brief · copy-writer ·
-design-a-screen · brief-to-html`. **`agent-domain-spec`** (added 0.3.0) is the Agent-App stage
+The 8 skills are `use-case-brief · run · agent-domain-spec · grill-to-brief · handoff-to-brief ·
+copy-writer · design-a-screen · brief-to-html`. **`handoff-to-brief`** (added 1.1.0) is an
+ALTERNATE entry point, parallel to `run`→`agent-domain-spec`→`grill-to-brief`, not a stage inside
+that chain: when the product is already decided and documented (a reverse-engineered spec of a
+live app, an old PRD), it extracts the same `screens-brief.md` contract straight from the doc
+instead of researching + interviewing, so `design-a-screen`/`brief-to-html` need no changes. It
+never writes `Agent-Domain-Spec.md`/`01-PRODUCT-MAP.md` and never renders a Decision Gate verdict.
+
+**`agent-domain-spec`** (added 0.3.0) is the Agent-App stage
 between `run` and `grill-to-brief`: research + core loop → `Agent-Domain-Spec.md` (the nghiệp-vụ
 agent-ised onto OpenClaw primitives), so the screen brief becomes a *projection* of that spec
 rather than a leap from core loop to UI. The HTML render stage was renamed `mockup-to-html` →

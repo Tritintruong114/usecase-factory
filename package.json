@@ -1,6 +1,6 @@
 {
   "name": "@clawexperts/claude-usecase-factory",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Claude Code plugin for ClawExperts Use-Case Factory: research AI Agent product ideas and produce a Proceed/Pivot/Narrow/Kill decision.",
   "keywords": [
     "claude",
