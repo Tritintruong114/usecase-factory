@@ -230,3 +230,19 @@ architecture and the developer guide, see [`CLAUDE.md`](./CLAUDE.md).
 ## License
 
 MIT
+
+---
+
+## OpenClaw Runtime Support
+
+This repository has **two runtimes**:
+
+| Runtime | Skill | Use case |
+|---------|-------|----------|
+| **Claude Desktop** | `skills/run/` (slash commands) | Full auto-pipeline: research → dossier → verdict → screens → prototype |
+| **OpenClaw Agent** | `skills/run-openclaw/` (Tavily + exec + sessions_spawn) | Same pipeline, manual steps, Telegram/presentation-friendly |
+
+Both produce identical `doc/ws-<slug>/` output layout — they can work on the same use-case.
+The OpenClaw skill is designed to survive tool timeouts and resume mid-pipeline.
+
+See `skills/run-openclaw/SKILL.md` for details.
