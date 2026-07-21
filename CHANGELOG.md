@@ -9,6 +9,33 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to choose a version bump.
 ## [Unreleased]
 
 ### Added
+- **New skill `grill-to-customer-value`** — an optional, standalone skill (not a pipeline stage;
+  nothing downstream depends on it) that grills the SAME dossier + 4 research docs
+  `agent-domain-spec` reads (not its output) into `doc/ws-<slug>/customer-value.md`: core customer
+  value, layered value (functional/economic/trust), ranked fears, opportunities, problems, and the
+  feature groups addressing each fear/value, closing with a feature-centric traceability table.
+  Runs a 3-layer interview: persona self-answer (Claude picks a persona + a specific day-moment
+  from the docs and drafts hypotheses in character, evidence-labelled) → targeted interview (asks
+  the user only what the docs can't answer) → narrowing rounds (forces convergence — "pick 3, pick
+  1, what if it's missing" — until the core value and top fear each hold stable across 2
+  consecutive rounds), gated on a minimum ~12-question floor so the exercise builds the user's own
+  understanding, not just a file. Its fears/value are meant to inform `agent-domain-spec`'s
+  guardrails and `grill-to-brief`'s screen purposes only by a human reading it — no skill parses it
+  automatically. New template `10-customer-value.template.md`.
+
+- **New skill `brief-to-prototype-spec`** — an optional, explicit-invoke-only bridge that converts
+  `Agent-Domain-Spec.md` + `screens-brief.md` (+ an optional real `to-prototype` build) into a
+  `doc/ws-<slug>/prototype-spec.md`-shaped file for teams that also run an internal OpenClaw
+  build pipeline downstream (confirmed against `gitlab.firegroup.io/tryopenclaw/toc-use-cases` +
+  `.../use-case-renderers` — the private "Phase-2, a separate repo" this plugin's `CLAUDE.md`
+  already referred to). Runs in two modes: Mode A infers screen inventory/state machine/interaction
+  notes from `screens-brief.md` + `appendix/mockups.md` and fills the data contract from
+  `Agent-Domain-Spec.md`'s core objects/lifecycle/tool policy; Mode B (if `to-prototype` was run)
+  extracts the same sections mechanically from the real prototype code instead. Every non-mechanical
+  field that can't be traced to a source is flagged `<<DEFER: grill>>`, never invented. It never
+  reads from or writes to any external repo — only this repo's own output shape. New template
+  `09-prototype-spec.template.md`.
+
 - **New skill `handoff-to-brief`** — an alternate pipeline entry point for when a product is
   already decided and documented elsewhere (a reverse-engineered spec of a live app, an old PRD,
   a design-system export with a per-screen breakdown), replacing `run` → `agent-domain-spec` →
@@ -33,6 +60,11 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to choose a version bump.
 - `scripts/coverage-check.sh` now also checks `00-START-HERE.md` exists.
 - `scripts/validate-agent-domain-spec.sh` now also checks that `01-PRODUCT-MAP.md` exists next to
   the spec and is placeholder-free.
+
+### Fixed
+- **`to-prototype` (shipped 1.1.0) was never documented** in `README.md`'s skill tree/pipeline/skill
+  count or `CLAUDE.md`'s "In-flight note" — both now list it alongside the new
+  `brief-to-prototype-spec` addition.
 
 ### Changed
 - **Evidence moved into `appendix/`.** The dossier (was `_research/dossier.md`, now

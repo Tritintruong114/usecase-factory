@@ -49,9 +49,33 @@ agent-ised (objects, lifecycle, intents, signals, decision/approval policy, guar
 loop, background jobs) mapped onto **OpenClaw primitives** (skills · tools/connectors · memory ·
 sessions/subagents · cron/heartbeat · approval surfaces · guardrails · workspace state). The screen
 brief is then a *projection* of that spec. `copy-writer` is a sub-skill invoked by `grill-to-brief`
-(microcopy), not a standalone stage. The pipeline **stops at the Decision Pack** — it deliberately
-does NOT produce real backend code, an FE↔BE contract, or the real OpenClaw build. That's Phase-2,
-a separate repo.
+(microcopy), not a standalone stage. `to-prototype` is an optional 4th "mock" after `brief-to-html`
+— a live, manipulable React prototype inside `new-design/`, still design-time and throwaway. The
+pipeline **stops at the Decision Pack** — it deliberately does NOT produce real backend code, an
+FE↔BE contract, or the real OpenClaw build. That's Phase-2, a separate repo.
+
+**Optional bridge — `brief-to-prototype-spec`.** Confirmed (2026-07-18) that Phase-2 above is
+concretely `gitlab.firegroup.io/tryopenclaw/toc-use-cases` + `.../use-case-renderers` (private,
+internal repos — same lineage as this plugin: they ship near-identical `use-case-brief` /
+`design-a-screen` / `mockup-to-html` skills). Their `design-to-renderer` skill reads a locked
+`prototype-spec.md` + `mockups.md` as Phase-0 input and authors the real `install/manage.yaml` UI
+spec. `brief-to-prototype-spec` converts `Agent-Domain-Spec.md` + `screens-brief.md` (+ optionally a
+real `to-prototype` build) into a `prototype-spec.md`-shaped file so a Decision Pack can graduate
+into that pipeline without hand-transcription. It is explicit-invoke-only, never touches either
+external repo, and is irrelevant if you don't use `toc-use-cases` — see its playbook for the full
+section-by-section source mapping.
+
+**Optional standalone — `grill-to-customer-value`.** Not a stage in the chain above and nothing
+downstream depends on it — it reads the SAME dossier + 4 research docs as `agent-domain-spec` (not
+`Agent-Domain-Spec.md`), and can run any time after `run`, in parallel with the rest of the
+pipeline. Where the pipeline stages *justify a screen set* or *agent-ise a nghiệp-vụ*, this one
+*converges research into a customer-value verdict*: it grills the docs through a three-layer
+interview (persona self-answer → targeted interview → narrowing rounds until the core value and
+top fear each hold stable across 2 consecutive rounds, minimum ~12 questions) to produce
+`customer-value.md` — core customer value, layered value, ranked fears, opportunities, problems,
+and the feature groups that address each, closing with a feature-centric traceability table. Its
+fears can inform `agent-domain-spec`'s guardrails and its customer value can inform `grill-to-brief`'s
+screen purposes, but only by a human reading it — no skill parses it automatically.
 
 Command namespace: every skill is invoked as `/usecase-factory:<skill>` (e.g.
 `/usecase-factory:run sale-ai-agent <idea + market>`).
@@ -98,6 +122,12 @@ number in different folders.
   and `brief-to-html` as each stage's artifacts become available. On the `handoff-to-brief` entry
   path, this same template is written directly by `handoff-to-brief` instead (with its `Verdict`
   section swapped for a `Source` section — see that skill's playbook), since `run` never ran.
+- `09-prototype-spec` lives in `skills/brief-to-prototype-spec/templates/` → `prototype-spec.md`, the
+  optional bridge artifact for teams also running `toc-use-cases`' `design-to-renderer` (see above)
+  — NOT a Decision Pack file, don't route to it from `00-START-HERE.md`.
+- `10-customer-value` lives in `skills/grill-to-customer-value/templates/` → `customer-value.md`, the
+  optional standalone grill output (see above) — also NOT a Decision Pack file; `00-START-HERE.md`
+  gets at most a one-line pointer to it, never a routing dependency.
 
 If you change a template's headings, **update the matching validator** — heading names are a
 contract (see below).
@@ -156,13 +186,37 @@ and `scripts/coverage-check.sh` to match — otherwise valid output will fail va
   unless the maintainer explicitly confirms.
 
 ## In-flight note
-The 8 skills are `use-case-brief · run · agent-domain-spec · grill-to-brief · handoff-to-brief ·
-copy-writer · design-a-screen · brief-to-html`. **`handoff-to-brief`** (added 1.1.0) is an
+The 11 skills are `use-case-brief · run · agent-domain-spec · grill-to-brief · handoff-to-brief ·
+copy-writer · design-a-screen · brief-to-html · to-prototype · brief-to-prototype-spec ·
+grill-to-customer-value`.
+
+**`grill-to-customer-value`** is an optional standalone skill, not a stage in the
+`run`→`agent-domain-spec`→`grill-to-brief` chain and not depended on by anything downstream. It
+reads the same dossier + 4 research docs `agent-domain-spec` reads (not its output), and converges
+them — through a three-layer interview (persona self-answer, targeted interview, narrowing rounds
+with an explicit convergence + minimum-question-count gate) — into `customer-value.md`: core
+customer value, layered value, ranked fears, opportunities, problems, and the feature groups
+addressing each, closing with a feature-centric traceability table. See its own playbook for the
+full mechanic; `00-START-HERE.md` gets at most a one-line pointer to it.
+
+**`handoff-to-brief`** (added 1.1.0) is an
 ALTERNATE entry point, parallel to `run`→`agent-domain-spec`→`grill-to-brief`, not a stage inside
 that chain: when the product is already decided and documented (a reverse-engineered spec of a
 live app, an old PRD), it extracts the same `screens-brief.md` contract straight from the doc
 instead of researching + interviewing, so `design-a-screen`/`brief-to-html` need no changes. It
 never writes `Agent-Domain-Spec.md`/`01-PRODUCT-MAP.md` and never renders a Decision Gate verdict.
+
+**`to-prototype`** (added 1.1.0, alongside `handoff-to-brief`) is the optional 4th "mock": a live,
+manipulable React prototype rendered inside `new-design/`, after `brief-to-html`'s static viewer.
+Still throwaway design-time — no backend, no FE↔BE contract.
+
+**`brief-to-prototype-spec`** (added 1.2.0) is an optional, explicit-invoke-only BRIDGE, not a
+pipeline stage every user needs: it converts `Agent-Domain-Spec.md` + `screens-brief.md` into a
+`prototype-spec.md`-shaped file for teams that also run the internal `toc-use-cases` +
+`use-case-renderers` pipeline (confirmed 2026-07-18 to be the "Phase-2, a separate repo" this
+CLAUDE.md already referred to) and want to graduate a Decision Pack into their `design-to-renderer`
+skill without hand-transcription. It never touches those external repos — only this repo's own
+output shape.
 
 **`agent-domain-spec`** (added 0.3.0) is the Agent-App stage
 between `run` and `grill-to-brief`: research + core loop → `Agent-Domain-Spec.md` (the nghiệp-vụ

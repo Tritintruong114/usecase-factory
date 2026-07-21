@@ -31,6 +31,15 @@ Existing product's handoff/design doc → Screen brief → ASCII (optional) → 
 
 It never writes `Agent-Domain-Spec.md` / `01-PRODUCT-MAP.md` and never renders a Decision Gate verdict — those exist only to validate an undecided idea.
 
+### Optional bridge: handing a Decision Pack off to an internal OpenClaw build pipeline
+
+If your org also runs an internal OpenClaw use-case build pipeline downstream of this plugin (one
+that expects a locked `prototype-spec.md` as its own Phase-0 input — e.g. a `design-to-renderer`-style
+skill), `/usecase-factory:brief-to-prototype-spec <slug>` converts `Agent-Domain-Spec.md` +
+`screens-brief.md` (+ an optional real `to-prototype` build) into that shape, so the handoff doesn't
+require re-typing the domain spec by hand. This is explicit-invoke-only, never touches any external
+repo, and is irrelevant if you don't have such a downstream pipeline.
+
 ## The output shape — a Decision Pack, not a pile of files
 
 Every artifact in `doc/ws-<slug>/` falls into one of three tiers, and the file layout says so:
@@ -114,8 +123,26 @@ usecase-factory/
     brief-to-html/             # screen brief + design system → static HTML viewer; finalizes 00-START-HERE.md
       SKILL.md
       assets/                  # template.html + example.data.js
+    to-prototype/              # OPTIONAL 4th mock — live manipulable React prototype in new-design/
+      SKILL.md
+      assets/                  # index.jsx/fixtures.js/copy.js/bits.jsx/example-tab.jsx skeletons
+    brief-to-prototype-spec/   # OPTIONAL bridge — Agent-Domain-Spec.md + screens-brief.md → a
+                               # prototype-spec.md-shaped file for an internal OpenClaw build
+                               # pipeline downstream (e.g. a design-to-renderer-style skill)
+      SKILL.md
+      playbook.md
+      templates/
+        09-prototype-spec.template.md
     use-case-brief/            # OPTIONAL upstream — rough idea → validated brief.md seed
       SKILL.md
+    grill-to-customer-value/  # OPTIONAL standalone — dossier + 4 doc research → customer-value.md
+                               # (core customer value, ranked fears, opportunities, problems,
+                               # feature groups + a feature-centric traceability table). Not a
+                               # pipeline stage; nothing downstream depends on it.
+      SKILL.md
+      playbook.md              # 3-layer grill: persona self-answer → interview → narrowing rounds
+      templates/
+        10-customer-value.template.md
   agents/
     market-sizing-researcher.md         # worker A — market size & context
     jtbd-pain-researcher.md             # worker B — jobs-to-be-done & pain
@@ -200,12 +227,15 @@ A few rules are load-bearing — they are what make the output trustworthy:
 
 ## Development status
 
-- **v1.0.0** — local plugin MVP. The output shape became a stable **Decision Pack** contract in
-  1.0.0: `00-START-HERE.md` and `01-PRODUCT-MAP.md` are new required outputs, the dossier + 4
-  research docs + the ASCII map moved into `appendix/`, and the old terminal-only `HANDOFF.md` was
-  retired — its job is now carried by `00-START-HERE.md` from the very first stage. This is a
-  breaking change to output paths (see `CHANGELOG.md`).
-- **7 skills** — the pipeline `[use-case-brief] → run → agent-domain-spec → grill-to-brief → design-a-screen → brief-to-html`, plus `copy-writer` (microcopy, invoked by grill-to-brief), + **7 agents** (4 research workers + 1 adversarial decision-gate reviewer + `domain-modeler-agent` and the adversarial `agent-logic-reviewer` for the Agent Domain Spec). `agent-domain-spec` sits between `run` and `grill-to-brief`: it turns the research + core loop into `Agent-Domain-Spec.md` (how the nghiệp-vụ is agent-ised on OpenClaw) so the pipeline doesn't jump from a core loop straight to UI, then distills the product decision into `01-PRODUCT-MAP.md`. `design-a-screen` (ASCII) and `brief-to-html` (HTML) both branch off the screen brief: the ASCII is a coverage-gate artifact filed in `appendix/`, while `brief-to-html` renders from the brief + [design system](#design-system) and only cross-checks coverage against the ASCII. `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). The pipeline terminates with `brief-to-html` finalizing `00-START-HERE.md`; the live interactive prototype + the real OpenClaw build (which need a dev environment) are intentionally left to the dev repo.
+- **v1.2.0** (current, 2026-07-18) — local plugin MVP. **v1.0.0** made the output shape a stable
+  **Decision Pack** contract: `00-START-HERE.md` and `01-PRODUCT-MAP.md` are required outputs, the
+  dossier + 4 research docs + the ASCII map moved into `appendix/`, and the old terminal-only
+  `HANDOFF.md` was retired — its job is now carried by `00-START-HERE.md` from the very first stage
+  (breaking change to output paths). **v1.1.0** added `handoff-to-brief` (alternate entry for an
+  already-decided product) and `to-prototype` (optional live React prototype). **v1.2.0** added
+  `brief-to-prototype-spec` — an optional bridge into an internal downstream OpenClaw build
+  pipeline. See `CHANGELOG.md` for full detail per version.
+- **11 skills** — the pipeline `[use-case-brief] → run → agent-domain-spec → grill-to-brief → design-a-screen → brief-to-html → [to-prototype] → [brief-to-prototype-spec]`, plus `copy-writer` (microcopy, invoked by grill-to-brief), the alternate entry `handoff-to-brief`, and the optional standalone `grill-to-customer-value` (dossier + 4 doc research → `customer-value.md`: core customer value, ranked fears, opportunities, problems, and the feature groups addressing each, via a 3-layer grill — persona self-answer, targeted interview, narrowing rounds gated on a stability check + a minimum question count. Nothing else in the pipeline depends on it or reads it automatically), + **7 agents** (4 research workers + 1 adversarial decision-gate reviewer + `domain-modeler-agent` and the adversarial `agent-logic-reviewer` for the Agent Domain Spec). `agent-domain-spec` sits between `run` and `grill-to-brief`: it turns the research + core loop into `Agent-Domain-Spec.md` (how the nghiệp-vụ is agent-ised on OpenClaw) so the pipeline doesn't jump from a core loop straight to UI, then distills the product decision into `01-PRODUCT-MAP.md`. `design-a-screen` (ASCII) and `brief-to-html` (HTML) both branch off the screen brief: the ASCII is a coverage-gate artifact filed in `appendix/`, while `brief-to-html` renders from the brief + [design system](#design-system) and only cross-checks coverage against the ASCII. `use-case-brief` is an **optional** upstream (it only produces a seed `brief.md`; `run` works from a bare idea too). `to-prototype` is an **optional** 4th mock — a live, manipulable React prototype, still throwaway design-time. The pipeline terminates with `brief-to-html` finalizing `00-START-HERE.md`; the real OpenClaw build (which needs a dev environment) is intentionally left to a separate repo — `brief-to-prototype-spec` is an **optional** explicit-invoke bridge for teams whose separate repo expects a `prototype-spec.md`-shaped handoff (see [above](#optional-bridge-handing-a-decision-pack-off-to-an-internal-openclaw-build-pipeline)).
 - Tested locally with `claude --plugin-dir .` (skills + all 7 agents discovered via `claude plugin details`).
 - **npm-ready but not published** — no package will be pushed unless the maintainer explicitly confirms.
 

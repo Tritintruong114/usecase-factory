@@ -10,7 +10,7 @@
       "name": "usecase-factory",
       "source": "./",
       "description": "Research an AI Agent product idea into a dossier + four research docs and a Proceed/Pivot/Narrow/Kill decision.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "ClawExperts",
         "email": "tintt@firegroup.io"
@@ -26,5 +26,5 @@
       ]
     }
   ],
-  "version": "1.1.1"
+  "version": "1.2.0"
 }
